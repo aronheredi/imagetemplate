@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # --- Your Original Postgres Service ---
+  postgres:
+    image: postgres:latest
+    container_name: my_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD-password}
+      POSTGRES_DB: ${DB_NAME-postgres}
+    ports:
+      - "5432:5432" # Postgres port
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  # --- New MinIO Service ---
+  minio:
+    image: minio/minio
+    container_name: my_minio_storage
+    restart: always
+    environment:
+      # These are the credentials for the MinIO server itself
+      MINIO_ROOT_USER: ${MINIO_USER-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD-minioadmin}
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # MinIO S3 API Port
+      - "9001:9001" # MinIO Console (Web UI) Port
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  # Defines the volume for Postgres
+  postgres_data:
+    driver: local
+  # Defines the new volume for MinIO
+  minio_data:
+    driver: local
