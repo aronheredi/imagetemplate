@@ -3,7 +3,7 @@ import { Navigation } from './Navigation';
 
 export const Layout = () => {
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="h-screen bg-gray-900 overflow-hidden">
       <Navigation />
       <main className="pt-16">
         <Outlet />

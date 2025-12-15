@@ -1,8 +1,9 @@
 import { FabricObject } from "fabric";
 declare module "fabric" {
     interface FabricObject {
-        name: string;
+        name?: string;
+        id?: string;
     }
 }
 
-FabricObject.customProperties = ['name'];
+FabricObject.customProperties = ['name', 'id'];

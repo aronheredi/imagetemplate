@@ -39,11 +39,12 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
     const maxZoom = 3;
 
     // 1. Handle Spacebar Logic
+    // 1. Handle Spacebar Logic
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.repeat) return;
             if (e.code === "Space" || e.key === " ") {
-                e.preventDefault();
+                // e.preventDefault(); // Removed to prevent potential pointer freezing issues
                 spaceDownRef.current = true;
                 setIsSpacePressed(true);
                 if (canvas) canvas.selection = false;
@@ -51,17 +52,26 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         };
         const onKeyUp = (e: KeyboardEvent) => {
             if (e.code === "Space" || e.key === " ") {
-                e.preventDefault();
+                // e.preventDefault();
                 spaceDownRef.current = false;
                 setIsSpacePressed(false);
                 if (canvas) canvas.selection = true;
             }
         };
-        window.addEventListener("keydown", onKeyDown, { capture: true });
-        window.addEventListener("keyup", onKeyUp, { capture: true });
+        const onBlur = () => {
+            spaceDownRef.current = false;
+            setIsSpacePressed(false);
+            if (canvas) canvas.selection = true;
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        window.addEventListener("keyup", onKeyUp);
+        window.addEventListener("blur", onBlur);
+        
         return () => {
-            window.removeEventListener("keydown", onKeyDown, { capture: true });
-            window.removeEventListener("keyup", onKeyUp, { capture: true });
+            window.removeEventListener("keydown", onKeyDown);
+            window.removeEventListener("keyup", onKeyUp);
+            window.removeEventListener("blur", onBlur);
         };
     }, [canvas]);
 
@@ -115,7 +125,7 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         // For space+click, we need to check if space was pressed BEFORE the click
         const isMiddleMouse = e.button === 1;
         const isSpaceLeft = e.button === 0 && spaceDownRef.current;
-        
+
         // Allow panning if clicking on anything that is NOT the canvas itself
         // This covers the background div, the viewport div, and the wrapper div around the canvas
         const target = e.target as HTMLElement;
@@ -222,8 +232,8 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
                     className="absolute left-0 top-0 w-full h-full"
                     style={viewPortStyle}
                 >
-                    <FabricCanvas 
-                        setCanvas={setCanvas} 
+                    <FabricCanvas
+                        setCanvas={setCanvas}
                         isSpacePressed={isSpacePressed}
                         isPanning={isPanning}
                     />

@@ -1,0 +1,58 @@
+MVP Development Plan: Open Source Image Generation Platform
+1. MVP Goal & Hypothesis
+
+    Primary Goal: Deliver a "download and run" visual editor that allows a developer to install the platform and generate a programmatic image via a local API call within 15 minutes.
+
+    Hypothesis: Developers prefer a self-hosted, visual-first workflow for template design over pure-code solutions, provided the setup friction is near zero.
+
+    Technical Validation: Validate that the Fabric.js (Frontend) → node-canvas (Backend) rendering pipeline produces consistent results without browser-based rendering overhead.
+
+2. Target Audience (MVP)
+
+    Primary User: The "Local Developer." They need to generate dynamic images (e.g., social media cards, email headers) but want to keep data within their own infrastructure. They are comfortable using Docker and REST APIs but dislike manually coding canvas coordinates.
+
+3. Core Feature Set (Prioritized)
+IN (The Build List)
+
+    Dashboard: View, Create, Delete, and Rename templates.
+
+    Visual Editor:
+
+        Canvas: Fabric.js based.
+
+        Elements: Text (auto-resize), Images (upload/place), Shapes (Rectangles/Circles for overlays).
+
+        Properties: Edit position, size, color, and assign Variable Names (e.g., title_text).
+
+    Developer Tools:
+
+        JSON View: Read-only toggle to view the schema and copy it for debugging.
+
+        Sample Request generator: A "Copy CURL" button to quickly test the API.
+
+    Backend Engine:
+
+        POST /render endpoint accepting template_id + modifications.
+
+        Renders via node-canvas.
+
+    Storage: Automated local MinIO setup for asset storage.
+
+OUT (Post-MVP)
+
+    User Authentication / Multi-tenancy.
+
+    Bi-directional Code Editing (typing JSON to update canvas).
+
+    Custom Font Uploads (System fonts only for MVP).
+
+    Undo/Redo History.
+
+4. Technology Stack
+Component	Selection	Rationale
+Frontend	React + TypeScript	Robust state management for the complex editor interface; type safety prevents schema errors.
+Backend API	NestJS (Node.js)	Structured, scalable architecture that supports easy future expansion (Auth guards, etc.).
+Rendering	Node-Canvas	High-performance, server-side implementation of the Canvas API. Faster than headless browsers.
+Database	PostgreSQL	Reliable, relational storage for template metadata. Ready for complex queries later.
+File Storage	MinIO	S3-compatible object storage. Can be run locally via Docker for the "self-hosted" promise.
+Infrastructure	Docker Compose	Orchestrates App, DB, and MinIO containers. Includes an init script to auto-provision buckets.

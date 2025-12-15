@@ -1,0 +1,258 @@
+UX & UI Specifications: Open Source Image Generation Platform
+1. Information Architecture
+1.1 Screen Map
+
+The application follows a flat, utility-focused hierarchy typical of developer tools.
+
+    Global Navigation (Top Bar)
+
+        Logo / Home Link
+
+        Link: "Dashboard" (Active State)
+
+        Link: "Settings"
+
+        Action: "Create New Template" (Primary CTA)
+
+    1. Dashboard (Home - /)
+
+        Hero/Header: Welcome message + Quick Actions.
+
+        Content Area: Grid of Template Cards.
+
+        Modals: "View JSON" Preview, "Create Template" (Name input).
+
+    2. Template Editor (/editor/:templateId)
+
+        Layout: 3-Column + Collapsible Code Panel.
+
+        Left: Elements Toolbox (Click-to-add).
+
+        Center: Canvas Workspace (Fabric.js).
+
+        Right: Properties Panel (Sticky "Variable Name").
+
+        Right-Extended: JSON Code Editor (Toggled).
+
+    3. Settings (/settings)
+
+        Section: API Key Management (List, Generate, Revoke).
+
+        Section: System Info (Version, Storage Status - optional).
+
+1.2 Layout Zones
+
+The Application Shell:
+
+    Max-Width: 100% (Fluid) for Editor; Container-bounded (e.g., 1200px) for Dashboard/Settings.
+
+    Scroll: Dashboard scrolls vertically. Editor is fixed-height (viewport 100vh) with internal scrolling for panels.
+
+2. Core User Flows
+Flow A: The "Quick Start" (First Run)
+
+    Goal: User understands the tool immediately upon installation.
+
+    Step 1: User loads /. Database is empty.
+
+    Step 2: System automatically seeds a "Demo Template" (Marketing Banner).
+
+    Step 3: Dashboard displays this card with a "Try Me" badge.
+
+    Step 4: User clicks "Edit".
+
+    Step 5: Editor opens. The "View Variables" toggle is ON by default for this template to show how mapping works.
+
+Flow B: The "Bi-Directional" Workflow
+
+    Goal: Developer tweaks a specific property not found in UI.
+
+    Step 1: User is in Editor.
+
+    Step 2: User toggles "Code View" (Switch/Icon in Top Bar).
+
+    Step 3: Workspace splits. Right side shows Monaco Editor with JSON.
+
+    Step 4: User changes "fill": "#000000" to "fill": "#FF0000" in JSON.
+
+    Step 5: User presses Ctrl+S or clicks out.
+
+    Step 6: Canvas updates immediately to red.
+
+3. View Specifications
+3.1 Dashboard View
+
+Layout: Responsive Grid (Auto-fill, min-width 300px).
+
+Component: Template Card
+Plaintext
+
++--------------------------------------------------+
+|  [ PREVIEW THUMBNAIL (Aspect Ratio 1.91:1) ]     |
+|  (Renders generic placeholder if no preview)     |
++--------------------------------------------------+
+|  Headline Text (Template Name)                   |
+|  ID: tmpl_x829... [Copy Icon]                    |
++--------------------------------------------------+
+|  [Edit Button]   [View JSON]   [... More]        |
++--------------------------------------------------+
+
+    [View JSON]: Triggers a modal displaying the template schema (read-only) with a "Copy to Clipboard" button.
+
+    [... More]: Dropdown menu containing: Duplicate, Rename, Delete.
+
+3.2 Template Editor View
+
+Layout Strategy: Flexbox/Grid. Visual Hierarchy:
+
+    Top Bar (Height: 60px):
+
+        Left: Back to Dashboard, Template Name (Editable).
+
+        Center: "View Variables" Toggle (Eye Icon).
+
+        Right: "Code View" Toggle, "Save" (Primary), "Export Image" (Secondary).
+
+    The Workspace (Calc 100vh - 60px):
+
+        Left Sidebar (Width: 80px - 200px):
+
+            Pattern: "Click-to-Add".
+
+            Items: Text Block, Rectangle, Circle, Image Placeholder.
+
+            Visual: Large icons with labels.
+
+        Center Stage (Flex Grow, Gray Background):
+
+            Canvas: Centered, with shadow.
+
+            Overlays: When "View Variables" is ON, render small badges (e.g., [title_text]) floating top-left of corresponding elements.
+
+        Right Sidebar (Width: 300px, Fixed):
+
+            Zone A (Sticky Top): "API Binding".
+
+                Input: Variable Name (Text input).
+
+                Help Text: "Use this key in your JSON payload."
+
+            Zone B (Scrollable): "Visual Properties".
+
+                Context-aware controls (e.g., if Text selected: Font Family, Size, Color, Alignment).
+
+        Code Panel (Width: 0px -> 400px, Transition-enabled):
+
+            Slides in from right (pushing/shrinking the canvas, NOT overlaying).
+
+            Contains: Syntax-highlighted JSON editor.
+
+3.3 Settings Page
+
+Layout: Single column, centered container (max-width 800px). Component: API Key Table
+
+    Columns: Key Preview (sk_...492), Name/Label, Created At, Action.
+
+    Action: "Revoke" (Destructive, Red).
+
+    Create Flow: Button "Generate New Key" -> Modal -> Shows full key ONCE -> User must copy.
+
+4. Interaction Patterns
+4.1 Canvas Interactions (Fabric.js)
+
+    Selection: Single click selects an element.
+
+    Deselection: Clicking the empty gray area clears selection (Properties panel shows "Canvas Settings" i.e., Background Color, Dimensions).
+
+    Variable Badges:
+
+        State: If Toggle is ON, badges are visible.
+
+        Z-Index: Badges must float above the canvas elements but not interfere with clicking the element underneath (CSS: pointer-events: none on the badge container).
+
+4.2 Feedback Mechanisms
+
+    Save State:
+
+        "Unsaved Changes": Dirty state indicator (e.g., dot next to Template Name).
+
+        "Saving...": Spinner in Top Bar.
+
+        "Saved": Green checkmark fade-out.
+
+    Copy to Clipboard:
+
+        Clicking an ID or API Key triggers a temporary Tooltip: "Copied!".
+
+4.3 Error States
+
+    JSON Errors: If the user types invalid JSON in the Code View, the canvas should not attempt to render (prevent crash).
+
+        Visual: Red outline on Code Editor + Error message "Invalid JSON" at the bottom of the pane.
+
+5. Technical Implementation Notes (Frontend)
+5.1 Tech Stack Recommendations
+
+    Framework: React or Vue (Component-based is essential).
+
+    Canvas: fabric.js (v5 or v6).
+
+    Code Editor: @monaco-editor/react (for VS Code-like experience).
+
+    State Management:
+
+        Need a robust store (Zustand/Redux/Pinia) to sync Canvas State <-> JSON Editor.
+
+        Cycle: Canvas Change -> Serialize to JSON -> Update Store -> Update Code Editor.
+
+5.2 Responsive Behavior
+
+    Mobile/Tablet:
+
+        Dashboard: Stacks cards vertically.
+
+        Editor: Show a warning overlay: "Please use a Desktop for the best editing experience." (Fabric.js editing on mobile is complex and low-value for this persona).
+
+        Settings: Fully responsive.
+
+5.3 Design Tokens (Guidance)
+
+    Colors:
+
+        Background: #F9FAFB (Slate 50)
+
+        Surface: #FFFFFF (White)
+
+        Primary: #4F46E5 (Indigo 600)
+
+        Border: #E5E7EB (Gray 200)
+
+        Text: #111827 (Gray 900)
+
+        Canvas Background: #E5E7EB (Gray 200 - distinct from page bg)
+
+5.4 Pre-Made Template Data
+
+Ensure the backend initialization script populates a JSON row with:
+
+    Name: "Demo: Tech Conference Promo"
+
+    Elements:
+
+        Background Rectangle (Dark Blue)
+
+        Text: "Conference 2024" (Variable: event_name)
+
+        Image Placeholder: (Variable: speaker_photo)
+
+        Circle Shape: (Decorative overlay)
+
+6. Accessibility Considerations
+
+    Keyboard Nav: Users must be able to Tab through the Dashboard cards.
+
+    Focus: When a modal opens (View JSON), focus must be trapped within the modal.
+
+    Contrast: Ensure variable badges (e.g., Blue background, White text) pass WCAG AA contrast.
+
+    Labels: All icon-only buttons (like "Eye" toggle, "Trash" icon) must have aria-label or title attributes.

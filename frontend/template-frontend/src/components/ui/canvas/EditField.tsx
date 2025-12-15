@@ -10,16 +10,21 @@ interface EditFieldProps {
 }
 
 export const EditField = ({ fields }: EditFieldProps) => {
-
     return (
-        <div className="flex flex-row gap-2">
+        <div
+            className="grid gap-2"
+            style={{ gridTemplateColumns: `repeat(${fields.length}, minmax(0, 1fr))` }}
+        >
             {
                 fields.map((field, index) => (
-                    <div key={index}  >
-                        <h3 className="text-lg font-semibold text-gray-800">
+                    <div key={index} className="min-w-0"  >
+                        <h3 className="text-sm  text-slate-900">
                             {field.label}
                         </h3>
-                        {field.input}
+
+                        <div >
+                            {field.input}
+                        </div>
                     </div>
                 ))
             }

@@ -1,0 +1,100 @@
+Product Requirements Document (PRD): Open Source Image Generation Platform
+1. Introduction / Overview
+
+This product is a self-hosted, open-source web application designed to generate static images programmatically. It functions similarly to "Bannerbear," allowing users to create visual templates via a web interface and then generate unique images by sending dynamic data to an API. It utilizes Fabric.js for the canvas interactions and MinIO/S3 for storage.
+
+The platform aims to bridge the gap between simplicity (visual editor) and advanced control (bi-directional JSON editing), functioning as a single-tenant application for developers and content managers.
+2. Goals / Objectives
+
+    Democratize Image Generation: Provide a robust, free, and open-source alternative to paid SaaS image generation tools.
+
+    Developer Flexibility: Enable "Advanced Users" to manipulate templates programmatically via JSON while maintaining a "Simple" visual workflow.
+
+    Seamless Integration: Ensure easy storage integration via S3/MinIO compatibility.
+
+    Simplicity: Create a user experience that allows a template to be designed and an API call to be successfully made within minutes of installation.
+
+3. Target Audience / User Personas
+
+    The Developer (Primary): Wants to self-host the tool, configure MinIO, inspect the JSON payload for debugging, and integrate the API into their own apps.
+
+    The Content Creator/Marketer: Wants to visually design a marketing banner (drag-and-drop) without touching code, setting up the "look and feel" for the developer to automate later.
+
+4. User Stories
+
+    As a User, I want to drag and drop text, shapes, and images onto a canvas so that I can visually design an image template.
+
+    As a User, I want to toggle a "Code View" to see and edit the underlying JSON of my template so that I can fine-tune properties not exposed in the GUI.
+
+    As a User, I want to define unique variable names for specific elements (e.g., "title_text", "hero_image") so the API knows what to replace.
+
+    As a System Admin, I want to generate an API Key so that my API endpoints are secured from unauthorized access.
+
+    As a Developer, I want to send a POST request to the server with JSON data and receive a public URL to the generated image hosted on my S3 bucket.
+
+5. Functional Requirements
+5.1 Dashboard & Management
+
+    Single-Tenant Access: The system supports a single administrator/user environment.
+
+    Template List: The home screen must display a grid/list of all saved templates with thumbnails and basic metadata (Name, ID).
+
+    API Key Management: A settings section to generate, view, and revoke API keys for authenticating requests.
+
+5.2 The Template Editor
+
+    Canvas Tech: Built using Fabric.js.
+
+    Element Types:
+
+        Text: Support for a predefined set of fonts. Must support Auto-Resizing (text shrinks to fit the bounding box).
+
+        Images: Users can upload placeholder images. Support basic manipulation (move, resize, crop, opacity, border radius).
+
+        Shapes: Basic shapes (rectangles, circles) for backgrounds or overlays.
+
+    Variable Binding: Users must be able to assign a unique string ID (Variable Name) to any element.
+
+    JSON Toggle: A switch or tab to view the template schema in JSON format.
+
+        Bi-Directional: Edits made in the JSON view must immediately reflect on the visual canvas, and vice-versa.
+
+5.3 The Generation Engine (Backend)
+
+    Input: REST API Endpoint receiving a Template ID and a JSON payload of key-value pairs corresponding to the Variable Names.
+
+    Processing: The server renders the image based on the Fabric.js definition and the injected data.
+
+    Output Format: Static images (JPG, PNG).
+
+    Storage:
+
+        Compatible with S3 and MinIO.
+
+        Configuration via Environment Variables (bucket name, region, credentials).
+
+    Response: The API returns the File ID and the direct public URL of the generated image.
+
+6. Non-Functional Requirements
+
+    Portability: The application must be containerized (Docker) for easy self-hosting.
+
+    Performance: Image generation should be optimized to handle requests quickly (target: < 2 seconds per standard image).
+
+    Security: API endpoints must validate the Bearer Token (API Key) on every request.
+
+7. Success Metrics
+
+    Time-to-First-Image: A new user can install via Docker and generate their first API image within 15 minutes.
+
+    Reliability: 99.9% success rate for valid API requests.
+
+8. Open Questions / Future Considerations
+
+    Rate Limiting: Do we need to implement limits to prevent server crashes if the API is flooded?
+
+    Font Management: Will users eventually need to upload their own .ttf or .woff files?
+
+    Webhooks: Do we need asynchronous processing (webhooks) for very large images or high-volume batches in the future?
+
+    User Accounts: Should we eventually support multi-tenancy (multiple users with isolated templates)?

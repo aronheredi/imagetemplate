@@ -1,83 +1,104 @@
-import { useState } from 'react';
 import type { CanvasTool } from '@/types/canvas';
-import { Circle, Rect, Textbox, type Canvas } from 'fabric';
-
+import { Circle as FabricCircle, Rect, Textbox, type Canvas } from 'fabric';
+import { Bug, MousePointer2, Square, Circle, ALargeSmall } from 'lucide-react';
+import { useEditorStore } from '@/stores/editor-store';
+const newObjectId = () =>
+  (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+    ? crypto.randomUUID()
+    : `obj_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 export const CanvasTools = ({ canvas }: { canvas: Canvas | null }) => {
-    const [activeTool, setActiveTool] = useState<CanvasTool | null>(null);
-    // Add element when tool is clicked
-    const handleAddElement = (tool: CanvasTool) => {
-        if (!canvas) return;
-        setActiveTool(tool);
-        let obj;
+  const activeTool = useEditorStore((state) => state.activeTool);
+  const setActiveTool = useEditorStore((state) => state.setActiveTool);
 
-        switch (tool.type) {
-            case 'select':
-                return;
-            case 'rect':
-                obj = new Rect({
-                    left: 100,
-                    top: 100,
-                    fill: 'red',
-                    width: 80,
-                    height: 60,
-                });
-                break;
+  const handleAddElement = (tool: CanvasTool) => {
+    if (!canvas) return;
 
-            case 'circle':
-                obj = new Circle({
-                    left: 150,
-                    top: 150,
-                    fill: 'blue',
-                    radius: 40,
-                });
-                break;
+    setActiveTool(tool.type);
 
-            case 'text':
-                obj = new Textbox('Edit me', {
-                    left: 200,
-                    top: 200,
-                    fontSize: 20,
-                    fill: '#333',
-                });
-                break;
-            case 'debug':
-                console.log(canvas.toObject(['name']));
+    switch (tool.type) {
+      case 'select':
+        return;
 
-                return;
-                break;
+      case 'debug':
+        console.log(canvas.toObject(['name']));
+        return;
 
-            default:
-                return;
-        }
-        obj.name = canvas.getObjects().length.toString();
+      case 'rect': {
+        const obj = new Rect({
+          left: 100,
+          top: 100,
+          fill: '#ef4444',
+          width: 160,
+          height: 120,
+        });
+        obj.set('name', String(canvas.getObjects().length));
+        obj.set('id', newObjectId());
         canvas.add(obj);
         canvas.setActiveObject(obj);
-        canvas.renderAll();
-    };
-    const tools: CanvasTool[] = [
-        { type: 'select', label: 'Select', icon: 'cursor' },
-        { type: 'rect', label: 'Rectangle', icon: 'square' },
-        { type: 'circle', label: 'Circle', icon: 'circle' },
-        { type: 'text', label: 'Text', icon: 'text' },
-        { type: 'debug', label: 'Debug', icon: 'bug' },
-    ];
-    return (
-        <div className="flex flex-col gap-3" >
-            <h3 className="text-lg font-semibold text-gray-800" > Tools </h3>
-            {
-                tools.map((tool) => (
-                    <button
-                        type="button"
-                        key={tool.type}
-                        onClick={() => handleAddElement(tool)}
-                        className={`rounded-lg border px-3 py-2 text-sm font-medium transition-all duration-200 ${activeTool === tool
-                            ? 'border-blue-500 bg-blue-50 text-blue-700'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
-                            }`}
-                    >
-                        {tool.label}
-                    </button>
-                ))}
-        </div>
-    )
-}
+        canvas.requestRenderAll();
+        return;
+      }
+
+      case 'circle': {
+        const obj = new FabricCircle({
+          left: 150,
+          top: 150,
+          fill: '#3b82f6',
+          radius: 60,
+        });
+        obj.set('name', String(canvas.getObjects().length));
+        obj.set('id', newObjectId());
+        canvas.add(obj);
+        canvas.setActiveObject(obj);
+        canvas.requestRenderAll();
+        return;
+      }
+
+      case 'text': {
+        const obj = new Textbox('Edit me', {
+          left: 200,
+          top: 200,
+          fontSize: 28,
+          fill: '#111827',
+          width: 240,
+        });
+        obj.set('id', newObjectId());
+        obj.set('name', String(canvas.getObjects().length));
+        canvas.add(obj);
+        canvas.setActiveObject(obj);
+        canvas.requestRenderAll();
+        return;
+      }
+
+      default:
+        return;
+    }
+  };
+
+  const tools: CanvasTool[] = [
+    { type: 'select', label: 'Select', icon: MousePointer2 },
+    { type: 'rect', label: 'Rectangle', icon: Square },
+    { type: 'circle', label: 'Circle', icon: Circle },
+    { type: 'text', label: 'Text', icon: ALargeSmall },
+    { type: 'debug', label: 'Debug', icon: Bug },
+  ];
+
+  return (
+    <div className="flex h-full w-16 flex-col gap-3 bg-white p-2">
+      {tools.map((tool) => (
+        <button
+          type="button"
+          key={tool.type}
+          onClick={() => handleAddElement(tool)}
+          className={`rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${activeTool === tool.type
+            ? 'bg-slate-100 text-slate-900'
+            : 'border-gray-300 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          title={tool.label}
+        >
+          {<tool.icon />}
+        </button>
+      ))}
+    </div>
+  );
+};
