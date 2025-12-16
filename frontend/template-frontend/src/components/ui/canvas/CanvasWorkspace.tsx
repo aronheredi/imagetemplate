@@ -38,13 +38,11 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
     const minZoom = 0.2;
     const maxZoom = 3;
 
-    // 1. Handle Spacebar Logic
-    // 1. Handle Spacebar Logic
+
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.repeat) return;
             if (e.code === "Space" || e.key === " ") {
-                // e.preventDefault(); // Removed to prevent potential pointer freezing issues
                 spaceDownRef.current = true;
                 setIsSpacePressed(true);
                 if (canvas) canvas.selection = false;
@@ -52,7 +50,6 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         };
         const onKeyUp = (e: KeyboardEvent) => {
             if (e.code === "Space" || e.key === " ") {
-                // e.preventDefault();
                 spaceDownRef.current = false;
                 setIsSpacePressed(false);
                 if (canvas) canvas.selection = true;
@@ -67,7 +64,7 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("keyup", onKeyUp);
         window.addEventListener("blur", onBlur);
-        
+
         return () => {
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("keyup", onKeyUp);
@@ -75,8 +72,7 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         };
     }, [canvas]);
 
-    // 2. Setup Window Listeners for Panning
-    // This effect activates only when 'isPanning' is true
+
     useEffect(() => {
         if (!isPanning) return;
 
@@ -86,17 +82,13 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
 
             e.preventDefault();
 
-            // Calculate delta from the drag start point
             const dx = e.clientX - s.startX;
             const dy = e.clientY - s.startY;
 
-            // Update pan based on initial pan + delta
-            // Use ref directly for synchronous update
             const newPan = { x: s.pan0.x + dx, y: s.pan0.y + dy };
             panRef.current = newPan;
             setPan(newPan);
 
-            // Force a style update on the viewport element directly for smooth dragging
             if (viewportRef.current) {
                 viewportRef.current.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(${zoomRef.current})`;
             }
@@ -119,15 +111,13 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         };
     }, [isPanning]);
 
-    // 3. Initiate Pan (Attached to Container)
+    // 3. panning, with middle mouse button, space + left mouse, or just simply click if outside canvas
     const beginPan = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-        // Only handle left button (0) or middle button (1)
-        // For space+click, we need to check if space was pressed BEFORE the click
+
         const isMiddleMouse = e.button === 1;
         const isSpaceLeft = e.button === 0 && spaceDownRef.current;
 
-        // Allow panning if clicking on anything that is NOT the canvas itself
-        // This covers the background div, the viewport div, and the wrapper div around the canvas
+
         const target = e.target as HTMLElement;
         const isCanvas = target.tagName === 'CANVAS';
         const isBackgroundPan = e.button === 0 && !isCanvas;
@@ -141,29 +131,17 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         panStartRef.current = {
             startX: e.clientX,
             startY: e.clientY,
-            pan0: { ...panRef.current } // Use ref to get current pan
+            pan0: { ...panRef.current }
         };
 
         setIsPanning(true);
     }, []);
 
-    // 4. Zoom Logic
+    // zoom with scroll wheel
     const onWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
         e.preventDefault();
 
-        if (!e.ctrlKey) {
-            // Pan
-            const newPan = {
-                x: panRef.current.x - e.deltaX,
-                y: panRef.current.y - e.deltaY
-            };
-            setPan(newPan);
-            panRef.current = newPan;
-            if (viewportRef.current) {
-                viewportRef.current.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(${zoomRef.current})`;
-            }
-            return;
-        }
+
 
         const el = containerRef.current;
         if (!el) return;
@@ -182,29 +160,23 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         setZoom(nextZoom);
         setPan({ x: nextPanX, y: nextPanY });
 
-        // Update refs immediately
         zoomRef.current = nextZoom;
         panRef.current = { x: nextPanX, y: nextPanY };
 
-        // Update viewport directly
         if (viewportRef.current) {
             viewportRef.current.style.transform = `translate(${nextPanX}px, ${nextPanY}px) scale(${nextZoom})`;
         }
     }, []);
 
-    // Styles
     const viewPortStyle = useMemo(() => ({
         transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
         transformOrigin: '0 0',
         willChange: 'transform',
-        // Only disable pointer events if we want to pass them through to elements below
-        // Actually, let's NOT disable pointer events here
         pointerEvents: 'auto' as const,
     }), [pan.x, pan.y, zoom]);
 
     return (
         <div className="relative flex flex-1 overflow-hidden p-6 bg-gray-50 h-screen w-screen">
-            {/* Background Grid */}
             <div
                 className="pointer-events-none absolute inset-0 opacity-[0.1]"
                 style={{
@@ -213,7 +185,6 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
                 }}
             />
 
-            {/* Container: Catches events when Viewport is transparent (Space/Pan) */}
             <div
                 ref={containerRef}
                 className="relative h-full w-full overflow-hidden outline-none"
@@ -226,7 +197,6 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
                     userSelect: "none",
                 }}
             >
-                {/* Viewport: Moves visually */}
                 <div
                     ref={viewportRef}
                     className="absolute left-0 top-0 w-full h-full"

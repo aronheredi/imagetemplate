@@ -19,26 +19,24 @@ export default function FabricEditor({
 
   const setActiveObjectId = useEditorStore((state) => state.setActiveObjectId);
 
-  // Update cursor and selection state based on props
   useEffect(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
 
     if (isPanning) {
-        canvas.defaultCursor = 'grabbing';
-        canvas.hoverCursor = 'grabbing';
-        canvas.selection = false;
+      canvas.defaultCursor = 'grabbing';
+      canvas.hoverCursor = 'grabbing';
+      canvas.selection = false;
     } else if (isSpacePressed) {
-        canvas.defaultCursor = 'grab';
-        canvas.hoverCursor = 'grab';
-        canvas.selection = false;
+      canvas.defaultCursor = 'grab';
+      canvas.hoverCursor = 'grab';
+      canvas.selection = false;
     } else {
-        canvas.defaultCursor = 'default';
-        canvas.hoverCursor = 'move';
-        canvas.selection = true;
+      canvas.defaultCursor = 'default';
+      canvas.hoverCursor = 'move';
+      canvas.selection = true;
     }
-    
-    // Force render to apply cursor changes immediately if needed
+
     canvas.requestRenderAll();
   }, [isPanning, isSpacePressed]);
 
@@ -50,7 +48,6 @@ export default function FabricEditor({
       selection: true,
     });
 
-    // IMPORTANT: ensure Fabric updates both the backing store and the element size
     canvas.setDimensions({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }, { cssOnly: false });
 
     setCanvas(canvas);
@@ -76,7 +73,6 @@ export default function FabricEditor({
   }, [setCanvas, setActiveObjectId]);
 
   return (
-    // container controls visible size; overflow handled by CanvasWorkspace
     <div className="flex flex-col gap-3">
       <div className="inline-block rounded-lg bg-white shadow-sm ring-1 ring-slate-900/20">
         <canvas ref={canvasRef} className="block" />
