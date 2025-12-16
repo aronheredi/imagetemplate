@@ -15,7 +15,7 @@ export const CanvasPage = () => {
         <CanvasWorkspace setCanvas={setCanvas} canvas={canvas} />
         <div className='flex  flex-col '>
           <CanvasObjectEdit canvas={canvas} />
-          <LayersPanel />
+          <LayersPanel  canvas={canvas}/>
         </div>
       </div>
     </div>

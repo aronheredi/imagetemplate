@@ -1,15 +1,34 @@
 import { useLayersStore } from '@/stores/layers-store';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Circle, Eye, Square, Text, type LucideIcon } from 'lucide-react';
 export default function LayerItem({ id }: { id: string }) {
     const { attributes, listeners, setNodeRef, transform } = useSortable({ id });
+    const toggleSelect = useLayersStore((s) => s.toggleSelect);
     const meta = useLayersStore((s) => s.byId[id]);
     const style = {
         transform: CSS.Translate.toString(transform),
     };
+    const icons: Record<string, LucideIcon> = {
+        'text': Text,
+        'rectangle': Square,
+        'circle': Circle,
+    };
+
+    if (!meta) {
+        return null;
+    }
+
+    const Icon = icons[meta.type ?? 'rectangle'] ?? Square;
     return (
-        <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
+        <div ref={setNodeRef} {...attributes} {...listeners} style={style}
+         className={`w-full hover:bg-slate-100 px-2 py-1 cursor-pointer select-none rounded-lg flex flex-row  gap-4 items-center ${meta.selected ? 'bg-slate-100' : ''}`}
+          onClick={() => toggleSelect(id)}>
+            <Eye className={`w-4 h-4 ${meta?.visible ? 'text-slate-900' : 'text-slate-400 line-through'}`} />
+            <div className='flex flex-row gap-2 items-center'>
+            <Icon className='w-4 h-4 ' />
             Layer {meta?.name}
+            </div>
         </div>
 
 

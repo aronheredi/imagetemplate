@@ -5,8 +5,10 @@ export type LayerMeta = {
     type?: string;
     visible: boolean;
     locked: boolean;
+    selected: boolean;
 }
 type LayersState = {
+   
     order: string[];
     byId: Record<string, LayerMeta>;
 
@@ -17,6 +19,7 @@ type LayersState = {
     toggleLock: (id: string) => void;
 
     removeMissing: (existingIds: string[]) => void;
+    toggleSelect: (id: string) => void;
 }
 
 function arrayMove<T>(array: T[], fromIndex: number, toIndex: number): T[] {
@@ -28,6 +31,7 @@ function arrayMove<T>(array: T[], fromIndex: number, toIndex: number): T[] {
 export const useLayersStore = create<LayersState>((set, get) => ({
     order: [],
     byId: {},
+
 
     syncFromCanvas: (layers) => {
         set((state) => {
@@ -44,6 +48,7 @@ export const useLayersStore = create<LayersState>((set, get) => ({
                     type: l.type ?? prev?.type,
                     visible: l.visible ?? prev?.visible ?? true,
                     locked: l.locked ?? prev?.locked ?? false,
+                    selected: l.selected ?? prev?.selected ?? false,
                 };
                 nextOrder.push(l.id);
             }
@@ -96,6 +101,22 @@ export const useLayersStore = create<LayersState>((set, get) => ({
                 byId: nextById,
                 order: state.order.filter((id) => existingIds.includes(id)),
             };
+        });
+    },
+    toggleSelect: (id:string) => {
+        set((state) => {
+            const nextById = {...state.byId};
+            for(const layerId in nextById){
+                if(layerId === id){
+                    if(nextById[layerId].selected) return state;
+                    nextById[layerId].selected = !nextById[layerId].selected;
+                }else if(nextById[layerId].selected){
+                    nextById[layerId].selected = false;
+                }
+            }
+            return {
+                byId: nextById,
+            }
         });
     },
 }));
