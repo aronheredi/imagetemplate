@@ -1,4 +1,4 @@
-import type { RGBColor } from "react-color";
+import type { RGBColor } from 'react-color';
 
 
 

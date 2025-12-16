@@ -1,7 +1,7 @@
-import ColorPicker from "@/components/common/ColorPicker";
-import StringToColor from "@/utils/color-transform";
-import type { Canvas, FabricObject } from "fabric";
-import type { RGBColor } from "react-color";
+import ColorPicker from '@/components/common/ColorPicker';
+import StringToColor from '@/utils/color-transform';
+import type { Canvas, FabricObject } from 'fabric';
+import type { RGBColor } from 'react-color';
 interface CommonStyleProps {
     propUpdate: (key: string, value: string | number) => void;
     selectedObject: FabricObject;

@@ -50,6 +50,7 @@ export const CanvasObjectEdit = ({
   const update = (key: string, value: string | number) => {
     if (!canvas || !selectedObject) return;
     selectedObject.set(key, value);
+    canvas.fire('object:modified', { target: selectedObject });
     canvas.renderAll();
     forceUpdate();
   };

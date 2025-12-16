@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
+import type { FabricObject } from 'fabric';
 import { Canvas } from 'fabric';
 import { useEditorStore } from '@/stores/editor-store';
+import { useLayersStore } from '@/stores/layers-store';
 
 const DEFAULT_WIDTH = 1920;
 const DEFAULT_HEIGHT = 1080;
@@ -16,6 +18,11 @@ export default function FabricEditor({
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricRef = useRef<Canvas | null>(null);
+
+  const syncFromCanvas = useLayersStore((state) => state.syncFromCanvas);
+  const layerOrder = useLayersStore((state) => state.order);
+
+
 
   const setActiveObjectId = useEditorStore((state) => state.setActiveObjectId);
 
@@ -65,12 +72,56 @@ export default function FabricEditor({
       setActiveObjectId(null);
     });
 
+
+    const sync = () => {
+      const objs = canvas.getObjects() as Array<{ id?: string; name?: string; visible?: boolean; type?: string }>;
+
+      const layers = objs.filter((o) => Boolean(o.id))
+        .map((o) => ({
+          id: String(o.id),
+          name: o.name,
+          visible: o.visible,
+          type: o.type,
+        }));
+      syncFromCanvas(layers);
+    }
+    canvas.on('object:added', sync);
+    canvas.on('object:removed', sync);
+    canvas.on('object:modified', sync);
+
+
     canvas.requestRenderAll();
 
     return () => {
+      canvas.off('object:added', sync);
+      canvas.off('object:removed', sync);
+      canvas.off('object:modified', sync);
       canvas.dispose();
     };
-  }, [setCanvas, setActiveObjectId]);
+  }, [setCanvas, setActiveObjectId, syncFromCanvas]);
+
+  useEffect(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    if (layerOrder.length === 0) return;
+
+    const objects = canvas.getObjects() as Array<{ id?: string }>;
+    const byId = new Map<string, unknown>();
+
+    for (const obj of objects) {
+      if (obj.id) {
+        byId.set(obj.id, obj);
+      }
+    }
+    layerOrder.forEach((id, index) => {
+      const obj = byId.get(id) as FabricObject | undefined;
+      if (!obj) return;
+      canvas.moveObjectTo(obj, index);
+    });
+
+    canvas.requestRenderAll();
+
+  }, [layerOrder]);
 
   return (
     <div className="flex flex-col gap-3">

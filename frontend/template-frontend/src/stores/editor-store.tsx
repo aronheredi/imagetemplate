@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export type ToolType = 'select' | 'rect' | 'circle' | 'text' | 'debug';
 type EditorStore = {

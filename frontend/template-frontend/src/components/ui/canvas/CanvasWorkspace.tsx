@@ -1,6 +1,6 @@
-import type { Canvas } from "fabric";
-import FabricCanvas from "./FabricCanvas";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Canvas } from 'fabric';
+import FabricCanvas from './FabricCanvas';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface CanvasWorkspace {
     setCanvas: (canvas: Canvas | null) => void;
@@ -42,14 +42,14 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.repeat) return;
-            if (e.code === "Space" || e.key === " ") {
+            if (e.code === 'Space' || e.key === ' ') {
                 spaceDownRef.current = true;
                 setIsSpacePressed(true);
                 if (canvas) canvas.selection = false;
             }
         };
         const onKeyUp = (e: KeyboardEvent) => {
-            if (e.code === "Space" || e.key === " ") {
+            if (e.code === 'Space' || e.key === ' ') {
                 spaceDownRef.current = false;
                 setIsSpacePressed(false);
                 if (canvas) canvas.selection = true;
@@ -61,14 +61,14 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
             if (canvas) canvas.selection = true;
         };
 
-        window.addEventListener("keydown", onKeyDown);
-        window.addEventListener("keyup", onKeyUp);
-        window.addEventListener("blur", onBlur);
+        window.addEventListener('keydown', onKeyDown);
+        window.addEventListener('keyup', onKeyUp);
+        window.addEventListener('blur', onBlur);
 
         return () => {
-            window.removeEventListener("keydown", onKeyDown);
-            window.removeEventListener("keyup", onKeyUp);
-            window.removeEventListener("blur", onBlur);
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('keyup', onKeyUp);
+            window.removeEventListener('blur', onBlur);
         };
     }, [canvas]);
 
@@ -180,8 +180,8 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
             <div
                 className="pointer-events-none absolute inset-0 opacity-[0.1]"
                 style={{
-                    backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)",
-                    backgroundSize: "20px 20px",
+                    backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)',
+                    backgroundSize: '20px 20px',
                 }}
             />
 
@@ -192,9 +192,9 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
                 onWheel={onWheel}
                 onContextMenu={(e) => e.preventDefault()}
                 style={{
-                    cursor: isPanning ? "grabbing" : isSpacePressed ? "grab" : "default",
-                    touchAction: "none",
-                    userSelect: "none",
+                    cursor: isPanning ? 'grabbing' : isSpacePressed ? 'grab' : 'default',
+                    touchAction: 'none',
+                    userSelect: 'none',
                 }}
             >
                 <div

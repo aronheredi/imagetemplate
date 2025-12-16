@@ -1,6 +1,7 @@
 import { CanvasObjectEdit } from '@/components/ui/canvas/CanvasObjectEdit';
 import { CanvasTools } from '@/components/ui/canvas/CanvasTools';
 import CanvasWorkspace from '@/components/ui/canvas/CanvasWorkspace';
+import LayersPanel from '@/components/ui/canvas/layers/LayersPanel';
 import type { Canvas } from 'fabric';
 import { useState } from 'react';
 
@@ -12,7 +13,10 @@ export const CanvasPage = () => {
       <div className="fixed flex h-screen w-screen gap-5 bg-white shadow-lg overflow-hidden">
         <CanvasTools canvas={canvas} />
         <CanvasWorkspace setCanvas={setCanvas} canvas={canvas} />
-        <CanvasObjectEdit canvas={canvas} />
+        <div className='flex  flex-col '>
+          <CanvasObjectEdit canvas={canvas} />
+          <LayersPanel />
+        </div>
       </div>
     </div>
   );

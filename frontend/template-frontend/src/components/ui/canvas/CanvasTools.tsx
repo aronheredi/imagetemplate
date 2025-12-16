@@ -96,7 +96,7 @@ export const CanvasTools = ({ canvas }: { canvas: Canvas | null }) => {
             }`}
           title={tool.label}
         >
-          {<tool.icon />}
+          <tool.icon />
         </button>
       ))}
     </div>

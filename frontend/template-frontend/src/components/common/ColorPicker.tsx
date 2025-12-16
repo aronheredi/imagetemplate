@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { SketchPicker, type RGBColor } from "react-color";
+import { useMemo, useState } from 'react';
+import { SketchPicker, type RGBColor } from 'react-color';
 interface ColorPickerProps {
     onChange?: (color: RGBColor) => void;
     initialColor?: RGBColor;
