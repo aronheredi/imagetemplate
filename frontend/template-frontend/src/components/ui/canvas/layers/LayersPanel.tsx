@@ -20,33 +20,51 @@ export default function LayersPanel({canvas}: LayersPanelProps) {
             reorder(active.id as string, over.id as string);
         }
     }
-    //TODO: investigate why this doesnt work as intended
+    const handleLayerClick = (objId: string) => {
+        toggleSelect(objId);
+        if(canvas){
+            const obj = canvas.getObjects().find(o => o.id === objId);
+            if(obj){
+                canvas.setActiveObject(obj);
+                canvas.requestRenderAll();
+            }
+        }
+    }
     useEffect(() => {
         if (!canvas) return;
-        canvas.on('selection:created', () => {
-            const active = canvas.getActiveObject();
-            if (active && active.id) {
-                toggleSelect(active.id);
+        const handleSelectionCreated = () => {
+                const active = canvas.getActiveObject();
+                if (active?.id) {
+                    console.log('selection created', active.id);
+                    toggleSelect(active.id);
+                }   
             }
-        });
+            const handleSelectionUpdated = () => {
+                const active = canvas.getActiveObject();
+                if (active?.id) {
+                    console.log('selection updated', active.id);
+                    toggleSelect(active.id);
+                }
+            }
+            const handleSelectionCleared = () => {
+                console.log('selection cleared');
+                toggleSelect('');
+            }
+        canvas.on('selection:created', handleSelectionCreated);
+        canvas.on('selection:updated', handleSelectionUpdated);
+        canvas.on('selection:cleared', handleSelectionCleared);
+       
+    
 
-        canvas.on('selection:updated', () => {
-            const active = canvas.getActiveObject();
-            if (active && active.id) {
-                toggleSelect(active.id);
-            }
-        });
-        canvas.on('selection:cleared', () => {
-            toggleSelect('');
-        });
+        
 
         return () => {
             if (!canvas) return;
-            canvas.off('selection:created');
-            canvas.off('selection:updated');
-            canvas.off('selection:cleared');
+            canvas.off('selection:created',handleSelectionCreated);
+            canvas.off('selection:updated',handleSelectionUpdated);
+            canvas.off('selection:cleared',handleSelectionCleared);
         };
-    }, [canvas]);
+    }, [canvas, toggleSelect]);
     return (
         <div className="w-full overflow-y-auto h-full p-2 ">
             <DndContext
@@ -55,7 +73,7 @@ export default function LayersPanel({canvas}: LayersPanelProps) {
                 onDragEnd={onDragEnd}>
                 <SortableContext items={layers} strategy={verticalListSortingStrategy}>
                     {layers.map((layerId) => (
-                        <LayerItem key={layerId} id={layerId} />
+                        <LayerItem key={layerId} id={layerId} onLayerClick={handleLayerClick} />
                     ))}
                 </SortableContext>
 

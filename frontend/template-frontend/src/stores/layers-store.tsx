@@ -106,12 +106,27 @@ export const useLayersStore = create<LayersState>((set, get) => ({
     toggleSelect: (id:string) => {
         set((state) => {
             const nextById = {...state.byId};
+            //deselect all if id is empty
+            if (!id) {
+            for (const layerId in nextById) {
+                if (nextById[layerId].selected) {
+                    nextById[layerId] = { ...nextById[layerId], selected: false };
+                }
+            }
+            return { byId: nextById };
+        }
             for(const layerId in nextById){
                 if(layerId === id){
-                    if(nextById[layerId].selected) return state;
-                    nextById[layerId].selected = !nextById[layerId].selected;
+                    
+                    console.log('selecting', layerId);
+                    nextById[layerId] = {
+                        ...nextById[layerId],
+                        selected:true
+                        
+                    };
                 }else if(nextById[layerId].selected){
-                    nextById[layerId].selected = false;
+                    console.log('deselecting', layerId);
+                    nextById[layerId] = { ...nextById[layerId], selected: false };
                 }
             }
             return {
