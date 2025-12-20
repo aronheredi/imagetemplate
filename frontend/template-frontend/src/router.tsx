@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components';
-import {  CanvasPage } from '@/pages';
+import { CanvasPage } from '@/pages';
+import { TemplatesPage } from './pages/TemplatesPage';
 
 export const router = createBrowserRouter([
   {
@@ -9,10 +10,10 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <CanvasPage />,
+        element: <TemplatesPage />,
       },
       {
-        path: 'canvas',
+        path: 'canvas/:id',
         element: <CanvasPage />,
       },
     ],

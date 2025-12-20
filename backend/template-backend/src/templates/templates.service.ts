@@ -43,7 +43,8 @@ export class TemplatesService {
     return this.templateRepository.save(updatedTemplate);
   }
 
-  remove(name: string): Promise<DeleteResult> {
-    return this.templateRepository.delete({ name });
+  remove(id: string): Promise<DeleteResult> {
+    return this.templateRepository.delete({ id });
   }
+
 }

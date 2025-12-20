@@ -27,8 +27,8 @@ export class TemplatesController {
     return this.templatesService.update(name, updateTemplateDto);
   }
 
-  @Delete(':name')
-  remove(@Param('name') name: string) {
-    return this.templatesService.remove(name);
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.templatesService.remove(id);
   }
 }
