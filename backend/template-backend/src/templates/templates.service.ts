@@ -26,18 +26,18 @@ export class TemplatesService {
     return this.templateRepository.find();
   }
 
-  async findOne(name: string): Promise<Template> {
-    const template = await this.templateRepository.findOne({ where: { name } });
+  async findOne(id: string): Promise<Template> {
+    const template = await this.templateRepository.findOne({ where: { id } });
     if (!template) {
-      throw new NotFoundException(`Template with name ${name} not found`);
+      throw new NotFoundException(`Template with id ${id} not found`);
     }
     return template;
   }
 
-  async update(name: string, updateTemplateDto: UpdateTemplateDto): Promise<Template> {
-    const template = await this.templateRepository.findOne({ where: { name } });
+  async update(id: string, updateTemplateDto: UpdateTemplateDto): Promise<Template> {
+    const template = await this.templateRepository.findOne({ where: { id } });
     if (!template) {
-      throw new NotFoundException(`Template with name ${name} not found`);
+      throw new NotFoundException(`Template with id ${id} not found`);
     }
     const updatedTemplate = Object.assign(template, updateTemplateDto);
     return this.templateRepository.save(updatedTemplate);

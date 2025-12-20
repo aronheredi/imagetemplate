@@ -13,7 +13,7 @@ export const router = createBrowserRouter([
         element: <TemplatesPage />,
       },
       {
-        path: 'canvas/:id',
+        path: 'templates/edit/:id',
         element: <CanvasPage />,
       },
     ],

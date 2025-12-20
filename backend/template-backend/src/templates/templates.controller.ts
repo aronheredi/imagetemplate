@@ -17,14 +17,14 @@ export class TemplatesController {
     return this.templatesService.findAll();
   }
 
-  @Get(':name')
-  findOne(@Param('name') name: string) {
-    return this.templatesService.findOne(name);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.templatesService.findOne(id);
   }
 
-  @Patch(':name')
-  update(@Param('name') name: string, @Body() updateTemplateDto: UpdateTemplateDto) {
-    return this.templatesService.update(name, updateTemplateDto);
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateTemplateDto: UpdateTemplateDto) {
+    return this.templatesService.update(id, updateTemplateDto);
   }
 
   @Delete(':id')

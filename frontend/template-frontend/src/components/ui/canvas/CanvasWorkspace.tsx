@@ -1,19 +1,33 @@
 import type { Canvas } from 'fabric';
 import FabricCanvas from './FabricCanvas';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import api from '@/api/axios';
+import { useQuery } from '@tanstack/react-query';
+import type { Template } from '@/types/templates';
 
 interface CanvasWorkspace {
     setCanvas: (canvas: Canvas | null) => void;
     canvas: Canvas | null;
+    templateId: string;
 }
 
 type Point = { x: number; y: number; }
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-
-export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) {
+const fetchTemplate = async (id: string): Promise<Template> => {
+    const response = await api(`/templates/${id}`);
+    if (response.status < 200 || response.status >= 300) {
+        throw new Error('Network response was not ok');
+    }
+    console.log('Fetched template:', response.data);
+    return response.data;
+}
+export default function CanvasWorkspace({ setCanvas, canvas, templateId }: CanvasWorkspace) {
     const viewportRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
-
+    const { data, isLoading, isError, refetch } = useQuery({
+        queryKey: ['templates', templateId],
+        queryFn: () => fetchTemplate(templateId)
+    });
     // State
     const [isPanning, setIsPanning] = useState(false);
     const [pan, setPan] = useState<Point>({ x: 0, y: 0 });
@@ -174,7 +188,9 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
         willChange: 'transform',
         pointerEvents: 'auto' as const,
     }), [pan.x, pan.y, zoom]);
-
+    if (isLoading) return <div>Loading template...</div>;
+    if (isError) return <div>Error loading template. Please try again.</div>;
+    if (!data) return <div>No template data found.</div>;
     return (
         <div className="relative flex flex-1 overflow-hidden p-6 bg-gray-50 h-screen w-screen">
             <div
@@ -206,6 +222,7 @@ export default function CanvasWorkspace({ setCanvas, canvas }: CanvasWorkspace) 
                         setCanvas={setCanvas}
                         isSpacePressed={isSpacePressed}
                         isPanning={isPanning}
+                        template={data!}
                     />
                 </div>
             </div>

@@ -3,6 +3,7 @@ import type { FabricObject } from 'fabric';
 import { Canvas } from 'fabric';
 import { useEditorStore } from '@/stores/editor-store';
 import { useLayersStore } from '@/stores/layers-store';
+import type { Template } from '@/types/templates';
 
 const DEFAULT_WIDTH = 1920;
 const DEFAULT_HEIGHT = 1080;
@@ -11,10 +12,12 @@ export default function FabricEditor({
   setCanvas,
   isSpacePressed,
   isPanning,
+  template,
 }: {
   setCanvas: (canvas: Canvas | null) => void;
   isSpacePressed: boolean;
   isPanning: boolean;
+  template: Template;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricRef = useRef<Canvas | null>(null);
@@ -89,8 +92,17 @@ export default function FabricEditor({
     canvas.on('object:removed', sync);
     canvas.on('object:modified', sync);
 
+    if (template.json) {
+      console.log('loaded template ' + template.json);
+      canvas.loadFromJSON(template.json, () => {
+        canvas.requestRenderAll();
+        sync();
+      });
+    } else {
+      sync();
+      canvas.requestRenderAll();
+    }
 
-    canvas.requestRenderAll();
 
     return () => {
       canvas.off('object:added', sync);
@@ -98,7 +110,7 @@ export default function FabricEditor({
       canvas.off('object:modified', sync);
       canvas.dispose();
     };
-  }, [setCanvas, setActiveObjectId, syncFromCanvas]);
+  }, [setCanvas, setActiveObjectId, syncFromCanvas, template.json]);
 
   useEffect(() => {
     const canvas = fabricRef.current;
