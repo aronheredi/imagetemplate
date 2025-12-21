@@ -1,4 +1,5 @@
 export class CreateTemplateDto {
     name: string;
-    json: any;
+    description?: string;
+    json?: any;
 }

@@ -4,7 +4,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export class Template {
     @PrimaryGeneratedColumn('uuid') id: string;
     @Column('text') name: string;
-    @Column('jsonb') json: any;
+    @Column('text', { nullable: true }) description?: string;
+    @Column('jsonb', { nullable: true }) json: any;
 
 
 }
