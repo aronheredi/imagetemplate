@@ -10,7 +10,6 @@ import sharp from 'sharp';
 @Injectable()
 export class ImagesService {
   constructor(private readonly templatesService: TemplatesService, private readonly filesService: FilesService) { }
-  //download image to prevent issues
 
   async create(createImageDto: CreateImageDto) {
     try {
