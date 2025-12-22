@@ -25,7 +25,7 @@ export const CanvasPage = () => {
 
   return (
     <div className="flex min-h-screen flex-row items-center justify-center bg-gray-900 text-gray-800 overflow-hidden">
-      <div className="fixed flex h-screen w-screen gap-5 bg-white shadow-lg overflow-hidden">
+      <div className="fixed flex h-screen w-screen  bg-white shadow-lg overflow-hidden">
         <CanvasTools canvas={canvas} />
         <CanvasWorkspace setCanvas={setCanvas} canvas={canvas} templateId={id} />
         <div className='flex  flex-col '>
