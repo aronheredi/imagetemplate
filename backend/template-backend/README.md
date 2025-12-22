@@ -57,6 +57,87 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## API Documentation
+
+### Template Management
+
+#### List Templates
+- **URL**: `/templates`
+- **Method**: `GET`
+
+#### Get Template
+- **URL**: `/templates/:id`
+- **Method**: `GET`
+
+#### Create Template
+- **URL**: `/templates`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+
+**Body:**
+```json
+{
+  "name": "My Template",
+  "description": "Optional description",
+  "json": { "version": "5.3.0", "objects": [] } 
+}
+```
+
+#### Update Template
+- **URL**: `/templates/:id`
+- **Method**: `PATCH`
+
+#### Delete Template
+- **URL**: `/templates/:id`
+- **Method**: `DELETE`
+
+### Create Image
+
+Generates an image based on a stored template and dynamic values.
+
+- **URL**: `/images`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+
+#### Request Body
+
+| Field | Type | Description |
+|---|---|---|
+| `templateId` | number | The ID of the template to use. |
+| `values` | array | An array of objects containing overrides for template elements. Match elements by `name`. |
+
+**Example Request:**
+
+```json
+{
+  "templateId": 1,
+  "values": [
+    {
+      "name": "headline",
+      "text": "Dynamic Title Text"
+    },
+    {
+      "name": "avatar",
+      "src": "https://example.com/profile.jpg"
+    },
+    {
+      "name": "background_shape",
+      "fill": "#FF0000"
+    }
+  ]
+}
+```
+
+#### Response
+
+Returns the URL of the generated and uploaded image.
+
+```json
+{
+  "url": "https://your-storage.com/uploads/images/template-171562345.png"
+}
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
