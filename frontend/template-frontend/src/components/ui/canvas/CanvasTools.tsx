@@ -1,16 +1,17 @@
 import type { CanvasTool } from '@/types/canvas';
-import { Circle as FabricCircle, Rect, Textbox, type Canvas } from 'fabric';
-import { Bug, MousePointer2, Square, Circle, ALargeSmall } from 'lucide-react';
+import { Circle as FabricCircle, FabricImage, Rect, Textbox, type Canvas } from 'fabric';
+import { Bug, MousePointer2, Square, Circle, ALargeSmall, Image } from 'lucide-react';
 import { useEditorStore } from '@/stores/editor-store';
 const newObjectId = () =>
   (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
     ? crypto.randomUUID()
     : `obj_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
 export const CanvasTools = ({ canvas }: { canvas: Canvas | null }) => {
   const activeTool = useEditorStore((state) => state.activeTool);
   const setActiveTool = useEditorStore((state) => state.setActiveTool);
 
-  const handleAddElement = (tool: CanvasTool) => {
+  const handleAddElement = async (tool: CanvasTool) => {
     if (!canvas) return;
 
     setActiveTool(tool.type);
@@ -69,6 +70,21 @@ export const CanvasTools = ({ canvas }: { canvas: Canvas | null }) => {
         canvas.requestRenderAll();
         return;
       }
+      case 'image': {
+        const img = await FabricImage.fromURL("https://picsum.photos/300/300", {}, {
+          left: 250,
+          top: 250,
+
+        });
+        img.set('id', newObjectId());
+        img.set('name', String(canvas.getObjects().length));
+        img.scaleToHeight(300);
+        img.scaleToWidth(300);
+        canvas.add(img);
+        canvas.setActiveObject(img);
+        canvas.requestRenderAll();
+        return;
+      }
 
       default:
         return;
@@ -80,6 +96,7 @@ export const CanvasTools = ({ canvas }: { canvas: Canvas | null }) => {
     { type: 'rect', label: 'Rectangle', icon: Square },
     { type: 'circle', label: 'Circle', icon: Circle },
     { type: 'text', label: 'Text', icon: ALargeSmall },
+    { type: 'image', label: 'Image', icon: Image },
     { type: 'debug', label: 'Debug', icon: Bug },
   ];
 

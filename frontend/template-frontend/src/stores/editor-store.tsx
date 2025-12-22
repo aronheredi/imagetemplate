@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ToolType = 'select' | 'rect' | 'circle' | 'text' | 'debug';
+export type ToolType = 'select' | 'rect' | 'circle' | 'text' | 'image' | 'debug';
 type EditorStore = {
     activeTool: ToolType;
     activeObjectId: string | null;

@@ -1,4 +1,4 @@
 export class CreateImageDto {
-    templateName: string;
+    templateId: string;
     values: any;
 }
