@@ -4,6 +4,9 @@ import RectangleEdit from './edit/RectangleEdit';
 import Break from '@/components/common/Break';
 import { useEffect, useMemo, useReducer } from 'react';
 import { useEditorStore } from '@/stores/editor-store';
+import { CircleEdit } from './edit/CircleEdit';
+import { TextEdit } from './edit/TextEdit';
+import React from 'react';
 
 export const CanvasObjectEdit = ({
   canvas
@@ -54,16 +57,21 @@ export const CanvasObjectEdit = ({
     canvas.renderAll();
     forceUpdate();
   };
-
+  const editPanels = {
+    'rect': RectangleEdit,
+    'circle': CircleEdit,
+    'textbox': TextEdit
+  }
   return (
     <aside className="flex h-full w-80 flex-col gap-3 border-l border-gray-200 bg-white p-4">
       <h3 className="text-lg font-semibold text-gray-800">Properties</h3>
 
-      {hasSelection ? (
+      {(hasSelection && selectedObject) ? (
         <>
           <CommonEdit update={update} selectedObject={selectedObject} />
           <Break />
-          {selectedObject?.type === 'rect' && <RectangleEdit selectedObject={selectedObject} update={update} />}
+
+          {editPanels[selectedObject.type as keyof typeof editPanels] ? (React.createElement(editPanels[selectedObject.type as keyof typeof editPanels], { selectedObject, update })) : null}
         </>
       ) : (
         <div className="text-sm text-gray-500">Select an object to edit its properties.</div>
