@@ -12,6 +12,7 @@ export const CanvasNavBar = () => {
     const id = useParams().id as string;
     const isActive = (path: string) => location.pathname === path;
     const setIsJsonPanelOpen = useEditorStore((state) => state.setJsonPanelOpen);
+    const isJsonPanelOpen = useEditorStore((state) => state.jsonPanelOpen);
     const onSave = async () => {
         if (!canvas) return;
         try {
@@ -38,7 +39,7 @@ export const CanvasNavBar = () => {
 
                 <div className="flex space-x-4">
                     <button
-                        onClick={() => setIsJsonPanelOpen(true)}
+                        onClick={() => setIsJsonPanelOpen(!isJsonPanelOpen)}
                         className="rounded flex flex-row gap-2 items-center px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-100 hover:text-slate-500 transition-colors duration-200"
                     >
                         <Code />

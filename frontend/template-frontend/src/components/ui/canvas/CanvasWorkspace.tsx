@@ -34,6 +34,7 @@ export default function CanvasWorkspace({ setCanvas, canvas, templateId }: Canva
     const [zoom, setZoom] = useState(1);
     const [isSpacePressed, setIsSpacePressed] = useState(false);
 
+
     // Refs for values that don't need to trigger re-renders
     const spaceDownRef = useRef(false);
     const panStartRef = useRef<{ startX: number; startY: number; pan0: Point } | null>(null);
