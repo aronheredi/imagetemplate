@@ -1,2 +1,2 @@
 export { Navigation } from './Navigation';
-export { Layout } from './Layout';
+export { Layout } from './Layouts/Layout';

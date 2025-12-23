@@ -1,10 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components';
+import { EditorLayout } from '@/components/Layouts/CanvasLayout';
 import { CanvasPage } from '@/pages';
 import { TemplatesPage } from './pages/TemplatesPage';
 
+
 export const router = createBrowserRouter([
   {
+
     path: '/',
     element: <Layout />,
     children: [
@@ -12,8 +15,15 @@ export const router = createBrowserRouter([
         index: true,
         element: <TemplatesPage />,
       },
+    ],
+  },
+  {
+
+    path: '/templates/edit/:id',
+    element: <EditorLayout />,
+    children: [
       {
-        path: 'templates/edit/:id',
+        index: true,
         element: <CanvasPage />,
       },
     ],
