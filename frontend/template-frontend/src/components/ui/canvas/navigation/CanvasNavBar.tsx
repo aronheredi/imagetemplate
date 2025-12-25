@@ -4,6 +4,7 @@ import { useEditorStore } from "@/stores/editor-store";
 import { Code, SaveIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { QueryBuilderPopup } from "../query/QueryBuilderPopup";
 
 export const CanvasNavBar = () => {
     const [isSaving, setIsSaving] = useState(false);
@@ -31,6 +32,7 @@ export const CanvasNavBar = () => {
             setIsSaving(false);
         }
     };
+    if (!canvas) return;
     return (
         <nav className="fixed left-0 right-0 top-0 z-50 pr-4 pl-4 bg-white/80 shadow-lg">
 
@@ -45,6 +47,7 @@ export const CanvasNavBar = () => {
                         <Code />
                         Code
                     </button>
+                    <QueryBuilderPopup canvas={canvas} />
                     <button
                         onClick={() => onSave()}
                         className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 bg-gradient-to-r from-slate-600 to-slate-800 hover:from-slate-700 hover:to-slate-900 text-white shadow-sm transition-all active:scale-95 ${isSaving ? 'opacity-50 pointer-events-none' : ''
