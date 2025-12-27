@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MinioModule } from './minio/minio.module';
 import { FilesService } from './files/files.service';
 import { FilesModule } from './files/files.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -34,7 +35,7 @@ import { FilesModule } from './files/files.module';
       // Good for dev, but dangerous in production.
       synchronize: true,
     }),
-  }), TemplatesModule, ImagesModule, MinioModule, FilesModule],
+  }), TemplatesModule, ImagesModule, MinioModule, FilesModule, AuthModule],
   controllers: [AppController],
   providers: [AppService, FilesService],
 })
