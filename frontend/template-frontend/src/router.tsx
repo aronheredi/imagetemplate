@@ -3,6 +3,7 @@ import { Layout } from '@/components';
 import { EditorLayout } from '@/components/Layouts/CanvasLayout';
 import { CanvasPage } from '@/pages';
 import { TemplatesPage } from './pages/TemplatesPage';
+import { AuthPage } from './pages/AuthPage';
 
 
 export const router = createBrowserRouter([
@@ -28,4 +29,14 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: 'auth',
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <AuthPage />
+      }
+    ]
+  }
 ]);
