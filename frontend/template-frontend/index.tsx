@@ -2,12 +2,23 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './src/App.tsx';
 import './src/styles/global.css';
-
+import { Auth0Provider } from '@auth0/auth0-react';
 // Ensure fabric customProperties/module augmentation is executed before any canvas usage
 import './src/utils/fabric-properties';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
+    <Auth0Provider
+      domain={import.meta.env.VITE_AUTH0_DOMAIN}
+      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+      }}
+      cacheLocation='localstorage'
+      useRefreshTokens={true}
+    >
+      <App />
+    </Auth0Provider>
+  </StrictMode >,
 );
