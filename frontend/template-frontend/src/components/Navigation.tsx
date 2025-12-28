@@ -3,6 +3,7 @@ import { useCanvasStore } from '@/stores/canvas-store';
 import type { Canvas } from 'fabric';
 import { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import { ProfileIconButton } from './common/ProfileIconButton';
 
 
 export const Navigation = () => {
@@ -38,15 +39,8 @@ export const Navigation = () => {
           </Link>
 
           <div className="flex space-x-4">
-            <button
-              onClick={() => onSave()}
-              className={`rounded px-3 py-2 text-sm font-medium transition-colors duration-200 ${isActive('/')
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                }`}
-            >
-              Save
-            </button>
+            <ProfileIconButton />
+
           </div>
         </div>
       </div>

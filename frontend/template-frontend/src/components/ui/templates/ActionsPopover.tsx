@@ -12,7 +12,7 @@ export const ActionsPopover = ({ onEdit, onDelete }: ActionsPopoverProps) => {
                     <DotsVerticalIcon />
                 </IconButton>
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content align="end">
+            <DropdownMenu.Content align="end" className="bg-white border border-slate-200">
                 <DropdownMenu.Item onSelect={onEdit}>Edit</DropdownMenu.Item>
                 <DropdownMenu.Item color="red" onSelect={onDelete}>Delete</DropdownMenu.Item>
 
