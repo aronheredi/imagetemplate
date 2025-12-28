@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components';
 import { EditorLayout } from '@/components/Layouts/CanvasLayout';
-import { CanvasPage } from '@/pages';
-import { TemplatesPage } from './pages/TemplatesPage';
+import AuthenticatedTemplatesPage from './pages/TemplatesPage';
+import AuthenticatedCanvasPage from './pages/CanvasPage';
 import { AuthPage } from './pages/AuthPage';
 
 
@@ -14,7 +14,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <TemplatesPage />,
+        element: <AuthenticatedTemplatesPage />,
       },
     ],
   },
@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <CanvasPage />,
+        element: <AuthenticatedCanvasPage />,
       },
     ],
   },

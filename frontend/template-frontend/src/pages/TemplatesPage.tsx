@@ -1,32 +1,37 @@
-import api from "@/api/axios"
+import { useApi } from "@/api/useApi"
+
 import { NewTemplateButton } from "@/components/ui/templates/NewTemplateButton"
 import { TemplatesCard } from "@/components/ui/templates/TemplatesCard"
 import type { Template } from "@/types/templates"
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
-
-const deletePost = async (id: string) => {
+import { api as axiosApi } from "@/api/axios"
+import type { AxiosInstance } from "axios"
+import { withAuthenticationRequired } from "@auth0/auth0-react"
+const deletePost = async (id: string, api: AxiosInstance) => {
     const response = await api.delete(`/templates/${id}`)
     if (response.status < 200 || response.status >= 300) {
         throw new Error('Network response was not ok')
     }
     return response.data;
 }
-const createPost = async (data: { name: string; description?: string }) => {
 
+const createPost = async (data: { name: string; description?: string }, api: AxiosInstance) => {
     const response = await api.post('/templates', data);
     if (response.status < 200 || response.status >= 300) {
         throw new Error('Network response was not ok')
     }
     return response.data;
 }
-export const TemplatesPage = () => {
+
+function TemplatesPage() {
+    const api = useApi();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ['templates'],
         queryFn: async () => {
-            const response = await api('/templates')
+            const response = await api.get('/templates')
             if (response.status < 200 || response.status >= 300) {
                 throw new Error('Network response was not ok')
             }
@@ -35,13 +40,13 @@ export const TemplatesPage = () => {
         }
     })
     const deleteMutation = useMutation({
-        mutationFn: deletePost,
+        mutationFn: (id: string) => deletePost(id, api),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['templates'] });
         }
     });
     const createMutation = useMutation({
-        mutationFn: async (data: { name: string; description?: string }) => await createPost(data),
+        mutationFn: (data: { name: string; description?: string }) => createPost(data, api),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['templates'] });
         }
@@ -74,3 +79,5 @@ export const TemplatesPage = () => {
         </div >
     )
 }
+const AuthenticatedTemplatesPage = withAuthenticationRequired(TemplatesPage, { onRedirecting: () => <div>Loading...</div> })
+export default AuthenticatedTemplatesPage;

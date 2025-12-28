@@ -6,12 +6,12 @@ import { JsonPanel } from '@/components/ui/canvas/json/JsonPanel';
 import LayersPanel from '@/components/ui/canvas/layers/LayersPanel';
 import { useCanvasStore } from '@/stores/canvas-store';
 import { useEditorStore } from '@/stores/editor-store';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 import type { Canvas } from 'fabric';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-
-export const CanvasPage = () => {
+function CanvasPage() {
   const id = useParams().id as string;
   const [canvas, setCanvas] = useState<Canvas | null>(null);
   const setGlobalCanvas = useCanvasStore((state) => state.setCanvas);
@@ -40,4 +40,6 @@ export const CanvasPage = () => {
       </div>
     </div>
   );
-};
+}
+const AuthenticatedCanvasPage = withAuthenticationRequired(CanvasPage, { onRedirecting: () => <div>Loading...</div> })
+export default AuthenticatedCanvasPage;
