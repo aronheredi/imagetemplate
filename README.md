@@ -53,7 +53,7 @@ npm run dev
 
 **🎉 Ready!** Open http://localhost:5173
 
-📖 **Detailed setup guide**: [SETUP.md](./SETUP.md)
+[Detailed setup guide](./SETUP.md)
 
 ## 📋 Quick Reference
 
@@ -66,13 +66,12 @@ npm run dev
 
 ## 📚 Documentation
 
-- **[Setup Guide](./SETUP.md)** - Quick setup instructions
-- **[API Documentation](./docs/API.md)** - Complete API reference
-- **[Architecture](./docs/ARCHITECTURE.md)** - System design and tech stack
+- **[Setup Guide](./SETUP.md)** - Setup instructions
+- **[API Documentation](./docs/API.md)** - API reference
 - **[Environment Variables](./docs/ENVIRONMENT.md)** - Configuration reference
 - **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
-## 🎯 How to Use
+## 🎯 Usage
 
 ### Creating Templates
 
@@ -89,16 +88,6 @@ npm run dev
 - `Ctrl/Cmd + C/V` - Copy/Paste
 - `Arrow Keys` - Nudge element
 - `Shift + Drag` - Maintain aspect ratio
-
-## 🏗️ Technology Stack
-
-**Frontend**: React 18, TypeScript, Vite, Fabric.js, Auth0 SDK, TanStack Query, Zustand, Tailwind CSS
-
-**Backend**: NestJS, TypeScript, TypeORM, PostgreSQL, Passport JWT, MinIO, Sharp
-
-**Infrastructure**: Docker, Docker Compose, Auth0
-
-📖 **Detailed architecture**: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
 ## 🔌 API Example
 
@@ -117,21 +106,21 @@ const response = await fetch('http://localhost:3000/templates', {
 const templates = await response.json();
 ```
 
-📖 **Full API documentation**: [docs/API.md](./docs/API.md)
+[Full API documentation](./docs/API.md)
 
 ## 🔒 Security
 
-- **OAuth 2.0 / OpenID Connect** via Auth0
-- **JWT token** authentication on all endpoints
-- **User isolation** - templates are private per account
-- **HTTPS required** for production deployments
-- **Environment-based** configuration (no hardcoded secrets)
+- OAuth 2.0 / OpenID Connect via Auth0
+- JWT token authentication on all endpoints
+- User isolation - templates are private per account
+- HTTPS for production deployments
+- Environment-based configuration
 
-📖 **Security best practices**: [docs/ENVIRONMENT.md#security-best-practices](./docs/ENVIRONMENT.md#security-best-practices)
+[Security details](./docs/ENVIRONMENT.md#security-best-practices)
 
 ## 🤝 Contributing
 
-Contributions welcome! Please:
+Contributions are welcome:
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
@@ -139,37 +128,18 @@ Contributions welcome! Please:
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-**Code style**: ESLint + Prettier (configured)
-
-## 🎯 Roadmap
-
-### Coming Soon
-- [ ] Collaborative editing (real-time)
-- [ ] Template marketplace
-- [ ] Export to PDF/SVG
-- [ ] Version history
-- [ ] Custom fonts
-- [ ] Batch processing
-
-### Completed
-- [x] Auth0 authentication
-- [x] JWT API security
-- [x] Image upload/storage
-- [x] Template CRUD operations
-- [x] Canvas editor
+Code style: ESLint + Prettier (configured)
 
 ## 📞 Support
 
-- **Bug reports**: [Open an issue](https://github.com/aronheredi/imagetemplate/issues)
-- **Questions**: [Start a discussion](https://github.com/aronheredi/imagetemplate/discussions)
-- **Security issues**: Email privately (see SECURITY.md)
+- Bug reports: [Open an issue](https://github.com/aronheredi/imagetemplate/issues)
+- Questions: [Start a discussion](https://github.com/aronheredi/imagetemplate/discussions)
+- Security issues: Email privately (see SECURITY.md)
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
-
-**Built with ❤️ for creators**
 
 [Get Started](./SETUP.md) • [Documentation](./docs/) • [API Reference](./docs/API.md)
