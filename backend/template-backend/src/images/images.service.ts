@@ -59,13 +59,18 @@ export class ImagesService {
           const { dataUrl, width, height } = await this.downloadToDataUrl(obj.src);
           console.log('Downloaded image', obj.name, 'size:', width, 'x', height, 'dataUrl:', dataUrl.substring(0, 30) + '...');
           obj.src = dataUrl;
-          //recaulculate scaling so the image fits the original dimensions
-          const oldWidth = target.width;
-          const oldHeight = target.height;
+          //get original dimensions
+          const oldWidth = target.width * (target.scaleX || 1);
+          const oldHeight = target.height * (target.scaleY || 1);
+
+          // Update dimensions
           obj.width = width;
           obj.height = height;
+
+          // scale to fit old dimensions
           obj.scaleX = oldWidth / width;
           obj.scaleY = oldHeight / height;
+
           console.log('Modified object:', obj);
 
           Object.assign(target, obj)
