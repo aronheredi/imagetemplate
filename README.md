@@ -1,369 +1,175 @@
 # Image Template Editor 🎨
 
-Create, customize, and manage stunning image templates with an intuitive drag-and-drop editor.  Perfect for social media graphics, marketing materials, and digital content creation.
+Create, customize, and manage stunning image templates with an intuitive drag-and-drop editor. Perfect for social media graphics, marketing materials, and digital content creation.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-94.2%25-blue)
 ![Node.js](https://img.shields.io/badge/Node.js-20.19%2B-green)
+![React](https://img.shields.io/badge/React-18-blue)
+![NestJS](https://img.shields.io/badge/NestJS-11-red)
 
-## ✨ What Can You Do? 
+## ✨ Features
 
-- 🖼️ **Design Custom Templates**: Drag, drop, and arrange images on an interactive canvas
-- 💾 **Save Your Work**: Store unlimited templates and reload them anytime
-- 🔄 **Reuse & Remix**: Load existing templates and modify them to create new designs
-- 🎯 **Simple Interface**: No design experience needed - just point, click, and create
-- ⚡ **Instant Updates**: See your changes in real-time as you work
-- 📱 **Works Everywhere**: Use on desktop, tablet, or mobile devices
+- 🖼️ **Interactive Canvas Editor**: Drag, drop, and arrange elements with Fabric.js
+- 💾 **Persistent Storage**: PostgreSQL database with MinIO object storage
+- 🔐 **Secure Authentication**: Auth0-powered OAuth 2.0 with JWT tokens
+- 🎨 **Rich Editing Tools**: Text, images, shapes, and styling options
+- ⚡ **Real-time Updates**: Instant preview of all changes
+- 📱 **Responsive Design**: Works on desktop, tablet, and mobile
+- 🔒 **Protected API**: All endpoints secured with JWT authentication
+- 🚀 **Modern Stack**: TypeScript, React, NestJS, Docker
 
-## 🎥 Quick Start Video
+## 🚀 Quick Start
 
-[Coming Soon - Watch a 2-minute walkthrough]
+### Prerequisites
 
-## 🚀 Try It Out
+- Node.js 20.19+ ([Download](https://nodejs.org/))
+- Docker Desktop ([Download](https://www.docker.com/products/docker-desktop/))
+- Auth0 Account ([Sign up](https://auth0.com/signup))
 
-### What You'll Need
-
-- A computer with **Node.js 20 or newer** ([Download here](https://nodejs.org/))
-- **Docker Desktop** for data storage ([Download here](https://www.docker.com/products/docker-desktop/))
-- 15 minutes to set everything up
-
-### Step 1: Download the Project
+### Installation
 
 ```bash
+# 1. Clone repository
 git clone https://github.com/aronheredi/imagetemplate.git
 cd imagetemplate
-```
 
-### Step 2: Start the Storage Services
-
-This command starts your local database and image storage:
-
-```bash
+# 2. Start Docker services
 docker-compose up -d
-```
 
-You should see messages indicating PostgreSQL and MinIO have started successfully.
-
-### Step 3: Configure the Backend
-
-Navigate to the backend folder: 
-
-```bash
+# 3. Setup backend
 cd backend/template-backend
 npm install
-```
-
-Create a file named `.env` in this folder with these settings:
-
-```env
-# Database Settings
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=password
-DB_NAME=postgres
-
-# Image Storage Settings
-MINIO_ENDPOINT=localhost
-MINIO_PORT=9000
-MINIO_USER=minioadmin
-MINIO_PASSWORD=minioadmin
-MINIO_USE_SSL=false
-MINIO_BUCKET_NAME=images
-
-# Server Settings
-PORT=3000
-```
-
-Start the backend server:
-
-```bash
+cp .env.example .env
+# Edit .env with your Auth0 credentials
 npm run start:dev
-```
 
-✅ **Success!** You should see "Application is running on:  http://localhost:3000"
-
-### Step 4: Launch the Editor
-
-Open a new terminal window and navigate to the frontend folder:
-
-```bash
+# 4. Setup frontend (new terminal)
 cd frontend/template-frontend
 npm install
+cp .env.example .env
+# Edit .env with your Auth0 credentials
 npm run dev
 ```
 
-✅ **You're Ready!** Open your browser to **http://localhost:5173**
+**🎉 Ready!** Open http://localhost:5173
 
-## 📖 How to Use
+📖 **Detailed setup guide**: [SETUP.md](./SETUP.md)
 
-### Creating Your First Template
+## 📋 Quick Reference
 
-1. **Open the Editor**: Navigate to http://localhost:5173 in your browser
-2. **Add Images**: Click the upload button or drag images onto the canvas
-3. **Arrange Elements**: Click and drag to position, resize handles to scale
-4. **Add Text**: Use the text tool to add captions and labels
-5. **Save Your Template**: Click "Save" and give your template a name
+| Service | URL | Access |
+|---------|-----|--------|
+| **Frontend** | http://localhost:5173 | Auth0 login |
+| **Backend API** | http://localhost:3000 | JWT token |
+| **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin |
+| **PostgreSQL** | localhost:5432 | postgres / password |
 
-### Loading Existing Templates
+## 📚 Documentation
 
-1. Click the **Templates** button in the top menu
-2. Browse your saved templates
-3. Click any template to load it into the editor
-4. Make changes and save as a new template or update the original
+- **[Setup Guide](./SETUP.md)** - Quick setup instructions
+- **[API Documentation](./docs/API.md)** - Complete API reference
+- **[Architecture](./docs/ARCHITECTURE.md)** - System design and tech stack
+- **[Environment Variables](./docs/ENVIRONMENT.md)** - Configuration reference
+- **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
-### Managing Your Templates
+## 🎯 How to Use
 
-- **View All**: See thumbnails of all your saved templates
-- **Search**: Find templates by name or description
-- **Edit**: Click any template to modify it
-- **Delete**: Remove templates you no longer need
-- **Duplicate**: Create copies to experiment without losing your original
+### Creating Templates
 
-## 🔌 Using the API (For Developers)
+1. Log in with Auth0
+2. Click "New Template"
+3. Add images, text, and shapes
+4. Customize colors, fonts, and layout
+5. Save your template
 
-If you're building an app or automation that needs to interact with templates programmatically, here's how: 
+### Keyboard Shortcuts
 
-### Base URL
-```
-http://localhost:3000
-```
+- `Delete` - Remove selected element
+- `Ctrl/Cmd + Z` - Undo
+- `Ctrl/Cmd + C/V` - Copy/Paste
+- `Arrow Keys` - Nudge element
+- `Shift + Drag` - Maintain aspect ratio
 
-### Get All Your Templates
+## 🏗️ Technology Stack
 
-```javascript
-fetch('http://localhost:3000/templates')
-  .then(response => response.json())
-  .then(templates => {
-    console.log('My templates:', templates);
-  });
-```
+**Frontend**: React 18, TypeScript, Vite, Fabric.js, Auth0 SDK, TanStack Query, Zustand, Tailwind CSS
 
-### Save a New Template
+**Backend**: NestJS, TypeScript, TypeORM, PostgreSQL, Passport JWT, MinIO, Sharp
 
-```javascript
-const newTemplate = {
-  name: "Summer Sale Banner",
-  description: "Promotional banner for summer campaign",
-  json: { /* Your design data */ }
-};
+**Infrastructure**: Docker, Docker Compose, Auth0
 
-fetch('http://localhost:3000/templates', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(newTemplate)
-})
-  .then(response => response.json())
-  .then(saved => console.log('Template saved:', saved));
-```
+📖 **Detailed architecture**: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 
-### Load a Specific Template
+## 🔌 API Example
 
 ```javascript
-const templateId = 'your-template-id';
+// Get access token from Auth0
+const token = await auth0.getTokenSilently();
 
-fetch(`http://localhost:3000/templates/${templateId}`)
-  .then(response => response.json())
-  .then(template => {
-    console.log('Loaded template:', template);
-  });
-```
-
-### Update an Existing Template
-
-```javascript
-const templateId = 'your-template-id';
-const updates = {
-  name: "Updated Banner Name",
-  description: "New description"
-};
-
-fetch(`http://localhost:3000/templates/${templateId}`, {
-  method: 'PATCH',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(updates)
-})
-  .then(response => response.json())
-  .then(updated => console.log('Template updated:', updated));
-```
-
-### Delete a Template
-
-```javascript
-const templateId = 'your-template-id';
-
-fetch(`http://localhost:3000/templates/${templateId}`, {
-  method: 'DELETE'
-})
-  .then(() => console.log('Template deleted'));
-```
-
-### Complete Integration Example
-
-```javascript
-// Example: Auto-save every 30 seconds
-class TemplateManager {
-  constructor() {
-    this.apiUrl = 'http://localhost:3000';
-    this.currentTemplateId = null;
+// Fetch templates
+const response = await fetch('http://localhost:3000/templates', {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
   }
+});
 
-  async saveTemplate(name, description, designData) {
-    const template = { name, description, json: designData };
-    
-    if (this.currentTemplateId) {
-      // Update existing
-      const response = await fetch(
-        `${this.apiUrl}/templates/${this.currentTemplateId}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(template)
-        }
-      );
-      return response.json();
-    } else {
-      // Create new
-      const response = await fetch(`${this.apiUrl}/templates`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(template)
-      });
-      const saved = await response.json();
-      this.currentTemplateId = saved.id;
-      return saved;
-    }
-  }
-
-  async loadTemplate(id) {
-    const response = await fetch(`${this.apiUrl}/templates/${id}`);
-    const template = await response.json();
-    this.currentTemplateId = template.id;
-    return template;
-  }
-
-  async getAllTemplates() {
-    const response = await fetch(`${this.apiUrl}/templates`);
-    return response.json();
-  }
-}
-
-// Usage
-const manager = new TemplateManager();
-
-// Save your work
-await manager.saveTemplate(
-  "My Design",
-  "A beautiful template",
-  { /* canvas data */ }
-);
-
-// Load all templates
-const templates = await manager.getAllTemplates();
-
-// Load specific template
-const template = await manager.loadTemplate('some-id');
+const templates = await response.json();
 ```
 
-## 🌐 Access Points
+📖 **Full API documentation**: [docs/API.md](./docs/API.md)
 
-Once everything is running, you can access:
+## 🔒 Security
 
-| What | Where | Use For |
-|------|-------|------|
-| **Template Editor** | http://localhost:5173 | Creating and editing templates |
-| **Storage Console** | http://localhost:9001 | Managing uploaded images |
-| **API Endpoint** | http://localhost:3000 | Programmatic access (developers) |
+- **OAuth 2.0 / OpenID Connect** via Auth0
+- **JWT token** authentication on all endpoints
+- **User isolation** - templates are private per account
+- **HTTPS required** for production deployments
+- **Environment-based** configuration (no hardcoded secrets)
 
-**Storage Console Login**:  
-- Username: `minioadmin`
-- Password: `minioadmin`
+📖 **Security best practices**: [docs/ENVIRONMENT.md#security-best-practices](./docs/ENVIRONMENT.md#security-best-practices)
 
-## ❓ Common Issues & Solutions
+## 🤝 Contributing
 
-### "Port already in use" Error
+Contributions welcome! Please:
 
-Someone is already using that port.  Close other apps or run:
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
-```bash
-# On Mac/Linux
-lsof -ti:3000 | xargs kill
-lsof -ti:5173 | xargs kill
-
-# On Windows
-npx kill-port 3000
-npx kill-port 5173
-```
-
-### Editor Won't Load
-
-1. Make sure the backend is running (Step 3)
-2. Check that Docker containers are running: `docker-compose ps`
-3. Verify you see green "✓" messages in your terminal
-
-### Can't Save Templates
-
-1. Check that Docker is running
-2. Visit http://localhost:9001 - if it loads, storage is working
-3. Look for error messages in your terminal
-
-### Templates Disappeared
-
-Your templates are stored in Docker volumes. If you ran `docker-compose down -v`, they were deleted.  Always use `docker-compose down` (without `-v`) to keep your data. 
-
-### Images Won't Upload
-
-1. Check your internet connection
-2. Ensure images are under 10MB
-3. Try JPG or PNG formats
-4. Restart the backend server
-
-## 💡 Tips & Tricks
-
-- **Keyboard Shortcuts**: Delete key removes selected items, Ctrl/Cmd+Z for undo
-- **Quick Resize**: Hold Shift while resizing to maintain proportions
-- **Alignment**: Use the alignment tools for precise positioning
-- **Color Picker**: Click any color tool to access the full spectrum
-- **Layer Order**: Right-click elements to bring forward or send backward
-
-## 🔒 Data & Privacy
-
-- All your templates are stored **locally** on your computer
-- No data is sent to external servers
-- Images are stored in MinIO (your local storage)
-- Database runs in Docker on your machine
-- You have complete control over your data
-
-## 🛠️ Built With
-
-Modern, reliable technology: 
-
-- **React** - Smooth, responsive interface
-- **Fabric.js** - Professional canvas editing
-- **NestJS** - Robust backend API
-- **PostgreSQL** - Reliable data storage
-- **MinIO** - S3-compatible image storage
-- **TypeScript** - Type-safe, fewer bugs
-
-## 📄 License
-
-Free to use under the MIT License.  See [LICENSE](LICENSE) file for details.
-
-## 🤝 Get Help
-
-- **Found a bug?** [Open an issue](https://github.com/aronheredi/imagetemplate/issues)
-- **Have a question?** [Start a discussion](https://github.com/aronheredi/imagetemplate/discussions)
-- **Want to contribute?** Pull requests are welcome!
+**Code style**: ESLint + Prettier (configured)
 
 ## 🎯 Roadmap
 
-Coming soon:
-- [ ] Template marketplace & sharing
-- [ ] Collaborative editing
-- [ ] Cloud sync option
-- [ ] Pre-made template library
+### Coming Soon
+- [ ] Collaborative editing (real-time)
+- [ ] Template marketplace
+- [ ] Export to PDF/SVG
+- [ ] Version history
+- [ ] Custom fonts
+- [ ] Batch processing
+
+### Completed
+- [x] Auth0 authentication
+- [x] JWT API security
+- [x] Image upload/storage
+- [x] Template CRUD operations
+- [x] Canvas editor
+
+## 📞 Support
+
+- **Bug reports**: [Open an issue](https://github.com/aronheredi/imagetemplate/issues)
+- **Questions**: [Start a discussion](https://github.com/aronheredi/imagetemplate/discussions)
+- **Security issues**: Email privately (see SECURITY.md)
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Ready to create something amazing?** Follow the setup steps above and start designing!  🚀
+**Built with ❤️ for creators**
 
-*Built with ❤️ for creators, by creators*
+[Get Started](./SETUP.md) • [Documentation](./docs/) • [API Reference](./docs/API.md)
