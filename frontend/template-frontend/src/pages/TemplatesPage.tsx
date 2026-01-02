@@ -28,7 +28,7 @@ function TemplatesPage() {
     const api = useApi();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const { data, isLoading, isError, refetch } = useQuery({
+    const { data, isLoading, isError, refetch, error } = useQuery({
         queryKey: ['templates'],
         queryFn: async () => {
             const response = await api.get('/templates')
@@ -52,7 +52,7 @@ function TemplatesPage() {
         }
     });
     if (isLoading) return <div>Loading your templates...</div>
-    if (isError) return <div>There was an error loading your templates.Try refreshing.</div>
+    if (isError) return <div>There was an error loading your templates.Try refreshing. {error.message}</div>
     return (
         <div className="mx-auto max-w-screen-xl" >
             <div className="flex flex-row items-center justify-between py-6">
