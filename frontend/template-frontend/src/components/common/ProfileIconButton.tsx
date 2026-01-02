@@ -6,7 +6,7 @@ import { Avatar, IconButton } from "@radix-ui/themes";
 import { LogOutIcon, Settings } from "lucide-react";
 
 export const ProfileIconButton = () => {
-    const { logout } = useAuth0();
+    const { logout, user } = useAuth0();
     return (
         <DropdownMenu.Root>
             <DropdownMenu.Trigger >
@@ -20,8 +20,8 @@ export const ProfileIconButton = () => {
 
             <DropdownMenu.Content align="start" className="text-start">
                 <div>
-                    <h1 className="text-sm font-semibold text-slate-900">John Doe</h1>
-                    <p className="text-xs text-slate-500">john.doe@example.com</p>
+                    <h1 className="text-sm font-semibold text-slate-900">{user?.name}</h1>
+                    <p className="text-xs text-slate-500">{user?.email}</p>
                 </div>
                 <DropdownMenu.Separator />
                 <DropdownMenu.Item>
