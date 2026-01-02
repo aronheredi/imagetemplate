@@ -1,7 +1,7 @@
 import api from "@/api/axios";
 import { useCanvasStore } from "@/stores/canvas-store";
 import { useEditorStore } from "@/stores/editor-store";
-import { Code, SaveIcon } from "lucide-react";
+import { ArrowLeft, ArrowLeftIcon, Code, SaveIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { QueryBuilderPopup } from "../query/QueryBuilderPopup";
@@ -36,7 +36,11 @@ export const CanvasNavBar = () => {
     return (
         <nav className="fixed left-0 right-0 top-0 z-50 pr-4 pl-4 bg-white/80 shadow-lg">
 
-            <div className="flex h-16 items-center justify-end ">
+            <div className="flex h-16 items-center justify-between">
+                <Link to="/" className="text-md font-bold text-slate-900">
+                    <ArrowLeftIcon className="inline mb-1 mr-2" />
+                    Back to Templates
+                </Link>
 
 
                 <div className="flex space-x-4">
