@@ -1,92 +1,78 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import axios from 'axios';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { User } from '../users/entities/user.entity';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly auth0Domain = process.env.AUTH0_M2M_DOMAIN;
-  private readonly clientId = process.env.AUTH0_M2M_CLIENT_ID;
-  private readonly clientSecret = process.env.AUTH0_M2M_CLIENT_SECRET;
-  private readonly audience = process.env.AUTH0_AUDIENCE;
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private jwtService: JwtService,
+  ) { }
 
 
-  async getM2MToken(): Promise<string> {
-    try {
-      const response = await axios.post(`https://${this.auth0Domain}/oauth/token`, {
-        grant_type: 'client_credentials',
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        audience: this.audience,
+  async register(registerDto: RegisterDto) {
+    const existingUser = await this.userRepository.findOne({ where: { email: registerDto.email } });
+    if (existingUser) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const newUser = this.userRepository.create({
+      email: registerDto.email,
+      password: hashedPassword,
+      name: registerDto.name,
+    });
+    await this.userRepository.save(newUser);
+    return this.generateTokens(newUser);
+  }
+
+  async login(loginDto: LoginDto) {
+    const user = await this.userRepository.findOne({ where: { email: loginDto.email } });
+    if (!user) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    if (!isPasswordValid) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
+    return this.generateTokens(user);
+  }
+
+
+  async validateUser(userId: string): Promise<User> {
+    console.log('[AuthService] validateUser looking up ID:', userId);
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      console.error('[AuthService] User not found in DB:', userId);
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
+  }
+
+  private generateTokens(user: User) {
+    const payload = { sub: user.id, email: user.email };
+    console.log('[AuthService] Generating token for user:', user.email);
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
       },
-        {
-          headers: { 'Content-Type': 'application/json' }
-        });
-
-      return response.data.access_token;
-    } catch (error) {
-      console.error('Error obtaining M2M token:', error);
-      throw new HttpException('Failed to obtain access token', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-  async exchangeCodeForToken(code: string, redirectUri: string) {
-    try {
-      const response = await axios.post(
-        `https://${this.auth0Domain}/oauth/token`,
-        {
-          grant_type: 'authorization_code',
-          client_id: this.clientId,
-          client_secret: this.clientSecret,
-          code: code,
-          redirect_uri: redirectUri,
-        },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
-
-      return {
-        access_token: response.data.access_token,
-        id_token: response.data.id_token,
-        refresh_token: response.data.refresh_token,
-        expires_in: response.data.expires_in,
-      };
-    } catch (error) {
-      console.error('Error exchanging code for token:', error);
-      throw new HttpException(
-        'Failed to exchange code for token',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    };
   }
 
-
-  async refreshToken(refreshToken: string) {
-    try {
-      const response = await axios.post(
-        `https://${this.auth0Domain}/oauth/token`,
-        {
-          grant_type: 'refresh_token',
-          client_id: this.clientId,
-          client_secret: this.clientSecret,
-          refresh_token: refreshToken,
-        },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        },
-      );
-
-      return {
-        access_token: response.data.access_token,
-        id_token: response.data.id_token,
-        expires_in: response.data.expires_in,
-      };
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-      throw new HttpException(
-        'Failed to refresh token',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-  }
 }
 
 

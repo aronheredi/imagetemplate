@@ -5,9 +5,7 @@ import { TemplatesCard } from "@/components/ui/templates/TemplatesCard"
 import type { Template } from "@/types/templates"
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
-import { api as axiosApi } from "@/api/axios"
 import type { AxiosInstance } from "axios"
-import { withAuthenticationRequired } from "@auth0/auth0-react"
 const deletePost = async (id: string, api: AxiosInstance) => {
     const response = await api.delete(`/templates/${id}`)
     if (response.status < 200 || response.status >= 300) {
@@ -79,5 +77,5 @@ function TemplatesPage() {
         </div >
     )
 }
-const AuthenticatedTemplatesPage = withAuthenticationRequired(TemplatesPage, { onRedirecting: () => <div>Loading...</div> })
-export default AuthenticatedTemplatesPage;
+
+export default TemplatesPage;

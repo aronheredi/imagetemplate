@@ -1,26 +1,37 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Injectable } from '@nestjs/common';
-import * as jwksRsa from 'jwks-rsa';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from './auth.service';
+
+type JwtPayload = {
+  sub: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+};
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-    constructor() {
-        super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            audience: process.env.AUTH0_AUDIENCE,
-            issuer: `https://${process.env.AUTH0_DOMAIN}/`,
-            algorithms: ['RS256'],
-            secretOrKeyProvider: jwksRsa.passportJwtSecret({
-                cache: true,
-                rateLimit: true,
-                jwksRequestsPerMinute: 5,
-                jwksUri: `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
-            }),
-        });
+  constructor(private authService: AuthService) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: process.env.JWT_SECRET || 'your-secret-key',
+    });
+
+    const secret = process.env.JWT_SECRET || 'your-secret-key';
+  }
+
+  async validate(payload: JwtPayload) {
+    console.log('[JwtStrategy] Validating payload:', payload);
+
+    const user = await this.authService.validateUser(payload.sub);
+
+    if (!user) {
+      console.error('[JwtStrategy] User not found for sub:', payload.sub);
+      throw new UnauthorizedException();
     }
 
-    validate(payload: any) {
-        return payload;
-    }
+    return { userId: user.id, email: user.email };
+  }
 }

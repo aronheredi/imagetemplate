@@ -1,41 +1,53 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@/components';
 import { EditorLayout } from '@/components/Layouts/CanvasLayout';
-import AuthenticatedTemplatesPage from './pages/TemplatesPage';
-import AuthenticatedCanvasPage from './pages/CanvasPage';
+import TemplatesPage from './pages/TemplatesPage';
+import CanvasPage from './pages/CanvasPage';
 import { AuthPage } from './pages/AuthPage';
-
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { RootLayout } from '@/components/RootLayout';
 
 export const router = createBrowserRouter([
   {
-
-    path: '/',
-    element: <Layout />,
+    element: <RootLayout />,
     children: [
       {
-        index: true,
-        element: <AuthenticatedTemplatesPage />,
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <TemplatesPage />,
+          },
+        ],
       },
-    ],
-  },
-  {
-
-    path: '/templates/edit/:id',
-    element: <EditorLayout />,
-    children: [
       {
-        index: true,
-        element: <AuthenticatedCanvasPage />,
+        path: '/templates/edit/:id',
+        element: (
+          <ProtectedRoute>
+            <EditorLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <CanvasPage />,
+          },
+        ],
       },
-    ],
-  },
-  {
-    path: 'auth',
-    element: <Layout />,
-    children: [
       {
-        index: true,
-        element: <AuthPage />
+        path: 'auth',
+        element: <Layout />,
+        children: [
+          {
+            index: true,
+            element: <AuthPage />
+          }
+        ]
       }
     ]
   }

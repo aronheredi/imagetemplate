@@ -6,7 +6,6 @@ import { JsonPanel } from '@/components/ui/canvas/json/JsonPanel';
 import LayersPanel from '@/components/ui/canvas/layers/LayersPanel';
 import { useCanvasStore } from '@/stores/canvas-store';
 import { useEditorStore } from '@/stores/editor-store';
-import { withAuthenticationRequired } from '@auth0/auth0-react';
 import type { Canvas } from 'fabric';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -41,5 +40,5 @@ function CanvasPage() {
     </div>
   );
 }
-const AuthenticatedCanvasPage = withAuthenticationRequired(CanvasPage, { onRedirecting: () => <div>Loading...</div> })
-export default AuthenticatedCanvasPage;
+
+export default CanvasPage;

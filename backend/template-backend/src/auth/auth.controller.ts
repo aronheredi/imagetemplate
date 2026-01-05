@@ -1,31 +1,29 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './public.decorator';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) { }
 
-    @Public()
-    @Post('m2m-token')
-    async getM2MToken(): Promise<string> {
-        const token = await this.authService.getM2MToken();
-        return token;
-    }
+  @Public()
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
+  }
 
+  @Public()
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
+  }
 
-    @Public()
-    @Get('callback')
-    async handleCallback(@Query('code') code: string, @Query('state') state: string): Promise<{ access_token: string; refresh_token: string, id_token: string }> {
-        const redirectUri = `${process.env.BACKEND_URL}/auth/callback`;
-        const tokens = await this.authService.exchangeCodeForToken(code, redirectUri);
-
-        return tokens;
-    }
-
-    @Public()
-    @Post('refresh')
-    async refreshToken(@Body('refresh_token') refreshToken: string) {
-        return await this.authService.refreshToken(refreshToken);
-    }
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req) {
+    return req.user;
+  }
 }

@@ -6,6 +6,6 @@ export class Template {
     @Column('text') name: string;
     @Column('text', { nullable: true }) description?: string;
     @Column('jsonb', { nullable: true }) json: any;
-
+    @Column('int') createdBy: number;
 
 }

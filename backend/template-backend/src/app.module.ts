@@ -9,6 +9,7 @@ import { MinioModule } from './minio/minio.module';
 import { FilesService } from './files/files.service';
 import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -35,7 +36,7 @@ import { AuthModule } from './auth/auth.module';
       // Good for dev, but dangerous in production.
       synchronize: true,
     }),
-  }), TemplatesModule, ImagesModule, MinioModule, FilesModule, AuthModule],
+  }), TemplatesModule, ImagesModule, MinioModule, FilesModule, AuthModule, UsersModule],
   controllers: [AppController],
   providers: [AppService, FilesService],
 })

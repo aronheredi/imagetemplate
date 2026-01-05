@@ -1,6 +1,6 @@
 import { AuthGuard } from '@nestjs/passport';
-import { ExecutionContext, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core/services/reflector.service';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
@@ -12,5 +12,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             return true;
         }
         return super.canActivate(context)
+    }
+
+    handleRequest(err: any, user: any, info: any) {
+        if (err || !user) {
+            console.error('JwtAuthGuard Authentication Failed:');
+            if (err) console.error('Error:', err);
+            if (info) console.error('Info (Passport):', info); // This often contains "jwt expired" or "No auth token"
+            throw err || new UnauthorizedException();
+        }
+        return user;
     }
 }
