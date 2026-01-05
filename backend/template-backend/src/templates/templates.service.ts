@@ -25,6 +25,9 @@ export class TemplatesService {
   async findAll(): Promise<Template[]> {
     return this.templateRepository.find();
   }
+  async findAllByUser(userId: string): Promise<Template[]> {
+    return this.templateRepository.find({ where: { createdBy: userId } });
+  }
 
   async findOne(id: string): Promise<Template> {
     const template = await this.templateRepository.findOne({ where: { id } });

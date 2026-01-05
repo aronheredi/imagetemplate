@@ -16,6 +16,10 @@ export class TemplatesController {
   findAll() {
     return this.templatesService.findAll();
   }
+  @Get('user/:userId')
+  findAllByUser(@Param('userId') userId: string) {
+    return this.templatesService.findAllByUser(userId);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
