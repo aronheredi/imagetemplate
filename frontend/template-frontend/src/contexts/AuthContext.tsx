@@ -16,7 +16,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const response = await authService.login(data);
             setAuth(response.user, response.access_token);
             setHasValidated(true); // Skip validation for fresh login
-            //navigate('/');
+            navigate('/');
         } catch (error) {
             console.error('Login error:', error);
             throw error;
