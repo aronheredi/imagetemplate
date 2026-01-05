@@ -17,7 +17,7 @@ export class TemplatesService {
     const { json, ...rest } = createTemplateDto;
     const newTemplate = this.templateRepository.create({
       ...rest,
-      json: JSON.stringify(json),
+      json: JSON.stringify(json)
     });
     return this.templateRepository.save(newTemplate);
   }

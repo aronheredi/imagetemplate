@@ -6,6 +6,8 @@ import type { Template } from "@/types/templates"
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import type { AxiosInstance } from "axios"
+import { useAuth } from "@/hooks/useAuth"
+import type { User } from "@/types/auth"
 const deletePost = async (id: string, api: AxiosInstance) => {
     const response = await api.delete(`/templates/${id}`)
     if (response.status < 200 || response.status >= 300) {
@@ -14,7 +16,9 @@ const deletePost = async (id: string, api: AxiosInstance) => {
     return response.data;
 }
 
-const createPost = async (data: { name: string; description?: string }, api: AxiosInstance) => {
+const createPost = async (data: { name: string; description?: string, createdBy?: string }, api: AxiosInstance, user: User) => {
+    data = { ...data, createdBy: user?.id };
+
     const response = await api.post('/templates', data);
     if (response.status < 200 || response.status >= 300) {
         throw new Error('Network response was not ok')
@@ -23,6 +27,7 @@ const createPost = async (data: { name: string; description?: string }, api: Axi
 }
 
 function TemplatesPage() {
+    const { user } = useAuth();
     const api = useApi();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -44,7 +49,7 @@ function TemplatesPage() {
         }
     });
     const createMutation = useMutation({
-        mutationFn: (data: { name: string; description?: string }) => createPost(data, api),
+        mutationFn: (data: { name: string; description?: string }) => createPost(data, api, user!),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['templates'] });
         }
