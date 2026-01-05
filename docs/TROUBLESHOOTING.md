@@ -23,24 +23,11 @@ This guide helps you resolve common issues when setting up and running the Image
 
 **Solutions:**
 
-1. **Verify Auth0 credentials match:**
-   ```bash
-   # Backend .env
-   cat backend/template-backend/.env | grep AUTH0
-   
-   # Frontend .env
-   cat frontend/template-frontend/.env | grep AUTH0
-   ```
-   - Ensure domains match your Auth0 tenant
-   - Verify client IDs are correct
-   - Check audience is exactly `http://imagetemplate`
+1. **Verify backend JWT configuration:**
+   - Ensure `JWT_SECRET` is set in `backend/template-backend/.env`
+   - If you changed `JWT_SECRET`, any existing tokens become invalid (re-login)
 
-2. **Check Auth0 dashboard configuration:**
-   - Allowed Callback URLs: `http://localhost:5173/callback`
-   - Allowed Logout URLs: `http://localhost:5173`
-   - Allowed Web Origins: `http://localhost:5173`
-
-3. **Clear browser data:**
+2. **Clear browser data:**
    ```javascript
    // Open browser console and run:
    localStorage.clear();
@@ -48,12 +35,12 @@ This guide helps you resolve common issues when setting up and running the Image
    // Then refresh the page
    ```
 
-4. **Check browser console:**
+3. **Check browser console:**
    - Look for CORS errors
    - Check for token validation errors
    - Verify API calls include Authorization header
 
-5. **Restart services:**
+4. **Restart services:**
    ```bash
    # Backend
    cd backend/template-backend
@@ -64,31 +51,24 @@ This guide helps you resolve common issues when setting up and running the Image
    npm run dev
    ```
 
-### Login Redirects to Wrong URL
+### Login Fails or Won't Persist
 
 **Symptoms:**
-- After Auth0 login, redirected to 404 page
-- Stuck in redirect loop
-- "Invalid callback URL" error
+- Login fails with 401
+- Logged out after refresh
+- API calls fail immediately after login
 
 **Solutions:**
 
-1. **Verify callback URLs in Auth0:**
-   - Must exactly match `http://localhost:5173/callback`
-   - No trailing slashes
-   - Check both SPA application settings
-
-2. **Check environment variables:**
+1. **Check environment variables:**
    ```env
    # frontend/.env
-   VITE_AUTH0_DOMAIN=your-tenant.us.auth0.com  # No https://
-   VITE_AUTH0_CLIENT_ID=correct-spa-client-id
+   VITE_API_URL=http://localhost:3000
    ```
 
-3. **Clear Auth0 session:**
-   - Go to Auth0 dashboard
-   - Check if user has active sessions
-   - Log out from Auth0 completely
+2. **Clear stored auth state and retry:**
+   - Clear site data (localStorage)
+   - Register/login again
 
 ### Token Expired Errors
 
@@ -103,13 +83,9 @@ This guide helps you resolve common issues when setting up and running the Image
    - Click logout button
    - Log in again to get fresh token
 
-2. **Check token expiration settings:**
-   - Auth0 dashboard → APIs → Image Template API
-   - Check Token Expiration (default 24 hours)
-
-3. **Enable token refresh (for production):**
-   - The Auth0 SDK should auto-refresh tokens
-   - Check browser console for refresh errors
+2. **Token expiry is expected in development:**
+   - Backend tokens currently expire after about 1 hour
+   - Re-login to get a fresh token
 
 ## Port Conflicts
 

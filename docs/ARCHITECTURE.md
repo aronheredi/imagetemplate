@@ -22,7 +22,7 @@ This document provides a comprehensive overview of the Image Template Editor's a
 | **TypeScript** | 5.x | Type-safe JavaScript with enhanced IDE support |
 | **Vite** | 7.x | Lightning-fast build tool and dev server |
 | **Fabric.js** | 6.x | HTML5 canvas library for graphics manipulation |
-| **Auth0 React SDK** | 2.x | Authentication and authorization integration |
+| **JWT Auth (custom)** | - | Email/password login and JWT token handling |
 | **TanStack Query** | 5.x | Server state management and caching |
 | **Zustand** | 5.x | Lightweight client state management |
 | **Tailwind CSS** | 4.x | Utility-first CSS framework |
@@ -38,10 +38,8 @@ This document provides a comprehensive overview of the Image Template Editor's a
 | **TypeORM** | 0.3.x | Database ORM with migration support |
 | **PostgreSQL** | Latest | Relational database for structured data |
 | **Passport JWT** | 4.x | JWT authentication strategy for Passport |
-| **jwks-rsa** | 3.x | RSA public key retrieval for Auth0 JWT verification |
 | **MinIO** | Latest | S3-compatible object storage for images |
 | **Sharp** | 0.34.x | High-performance image processing |
-| **Axios** | 1.x | HTTP client for Auth0 API calls |
 
 ### Infrastructure
 
@@ -49,7 +47,6 @@ This document provides a comprehensive overview of the Image Template Editor's a
 |------------|---------|
 | **Docker** | Container runtime for services |
 | **Docker Compose** | Multi-container orchestration |
-| **Auth0** | Authentication and authorization platform |
 
 ## System Architecture
 
@@ -64,14 +61,8 @@ This document provides a comprehensive overview of the Image Template Editor's a
 │  │  └──────────────┘  └──────────────┘  └─────────────┘ │ │
 │  └────────────────────────────────────────────────────────┘ │
 └──────────────────┬──────────────────────────────────────────┘
-                   │ HTTPS/Auth0
-                   │
-         ┌─────────▼─────────┐
-         │      Auth0        │
-         │   (Cloud SaaS)    │
-         └─────────┬─────────┘
-                   │ JWT Token
-                   │
+                   │ HTTPS
+                   │ JWT Bearer Token
 ┌──────────────────▼──────────────────────────────────────────┐
 │              NestJS Backend (Port 3000)                      │
 │  ┌────────────────────────────────────────────────────────┐ │
@@ -108,7 +99,7 @@ imagetemplate/
 │       │   │
 │       │   ├── auth/                   # Authentication module
 │       │   │   ├── auth.module.ts      # Auth module definition
-│       │   │   ├── auth.service.ts     # Auth0 token management
+│       │   │   ├── auth.service.ts     # Registration/login + JWT issuance
 │       │   │   ├── auth.controller.ts  # Auth endpoints
 │       │   │   ├── jwt.strategy.ts     # Passport JWT strategy
 │       │   │   ├── jwt-auth.guard.ts   # Route protection guard
@@ -155,7 +146,7 @@ imagetemplate/
 │       │   ├── router.tsx             # Route definitions
 │       │   │
 │       │   ├── pages/                 # Route pages
-│       │   │   ├── AuthPage.tsx       # Login/callback page
+│       │   │   ├── AuthPage.tsx       # Login/register page
 │       │   │   ├── CanvasPage.tsx     # Main editor
 │       │   │   └── TemplatesPage.tsx  # Template gallery
 │       │   │
@@ -210,7 +201,7 @@ imagetemplate/
 
 ## Authentication Flow
 
-The application uses Auth0 for authentication with OAuth 2.0 / OpenID Connect:
+The application uses email/password authentication with JWT access tokens. Users are stored in PostgreSQL.
 
 ```
 1. User Access
@@ -220,35 +211,21 @@ The application uses Auth0 for authentication with OAuth 2.0 / OpenID Connect:
    └─► Not authenticated
        │
        ▼
-2. Redirect to Auth0
+2. Login / Register
    │
-   ├─► User lands on Auth0 hosted login page
-   ├─► User enters credentials or uses social login
+   ├─► Frontend submits credentials to backend
+   ├─► POST /auth/login or POST /auth/register
    │
-   └─► Auth0 validates credentials
+   └─► Backend validates credentials (bcrypt)
        │
        ▼
-3. Authorization Code
+3. Token Issuance
    │
-   ├─► Auth0 redirects to callback URL
-   ├─► URL contains authorization code
-   │   Example: http://localhost:5173/callback?code=abc123
-   │
-   └─► Frontend receives code
+   ├─► Backend signs a JWT (subject = user id)
+   └─► Frontend stores token (client-side)
        │
        ▼
-4. Token Exchange
-   │
-   ├─► Frontend exchanges code for tokens
-   ├─► POST to Auth0 token endpoint
-   │
-   └─► Receives:
-       ├─► Access Token (JWT)
-       ├─► ID Token
-       └─► Refresh Token
-       │
-       ▼
-5. API Requests
+4. API Requests
    │
    ├─► Frontend includes JWT in Authorization header
    ├─► Example: Authorization: Bearer eyJhbGc...
@@ -256,28 +233,26 @@ The application uses Auth0 for authentication with OAuth 2.0 / OpenID Connect:
    └─► Backend receives request
        │
        ▼
-6. JWT Validation
+5. JWT Validation
    │
    ├─► Backend extracts JWT from header
-   ├─► Retrieves Auth0 public keys (JWKS)
-   ├─► Verifies JWT signature
-   ├─► Checks expiration and audience
+   ├─► Verifies JWT signature with `JWT_SECRET`
+   ├─► Checks expiration
    │
    └─► Valid token
        │
        ▼
-7. Access Granted
+6. Access Granted
    │
    └─► Backend returns requested resource
 ```
 
 ### Key Components
 
-**Frontend (Auth0 React SDK)**
-- Handles login/logout
-- Manages token storage
-- Auto-refreshes expired tokens
-- Provides authentication state
+**Frontend**
+- Handles login/register UI
+- Stores the JWT token client-side
+- Adds `Authorization: Bearer ...` to API calls
 
 **Backend (Passport JWT Strategy)**
 - Validates JWT signatures

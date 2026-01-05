@@ -11,7 +11,7 @@ Create, customize, and manage stunning image templates with an intuitive drag-an
 
 - 🖼️ **Interactive Canvas Editor**: Drag, drop, and arrange elements with Fabric.js
 - 💾 **Persistent Storage**: PostgreSQL database with MinIO object storage
-- 🔐 **Secure Authentication**: Auth0-powered OAuth 2.0 with JWT tokens
+- 🔐 **Secure Authentication**: Email/password login with JWT tokens (users stored in PostgreSQL)
 - 🎨 **Rich Editing Tools**: Text, images, shapes, and styling options
 - ⚡ **Real-time Updates**: Instant preview of all changes
 - 📱 **Responsive Design**: Works on desktop, tablet, and mobile
@@ -24,7 +24,6 @@ Create, customize, and manage stunning image templates with an intuitive drag-an
 
 - Node.js 20.19+ ([Download](https://nodejs.org/))
 - Docker Desktop ([Download](https://www.docker.com/products/docker-desktop/))
-- Auth0 Account ([Sign up](https://auth0.com/signup))
 
 ### Installation
 
@@ -40,14 +39,14 @@ docker-compose up -d
 cd backend/template-backend
 npm install
 cp .env.example .env
-# Edit .env with your Auth0 credentials
+# Configure DB/MinIO/JWT settings in .env if needed
 npm run start:dev
 
 # 4. Setup frontend (new terminal)
 cd frontend/template-frontend
 npm install
 cp .env.example .env
-# Edit .env with your Auth0 credentials
+# Configure API URL in .env if needed
 npm run dev
 ```
 
@@ -59,7 +58,7 @@ npm run dev
 
 | Service | URL | Access |
 |---------|-----|--------|
-| **Frontend** | http://localhost:5173 | Auth0 login |
+| **Frontend** | http://localhost:5173 | Email/password login |
 | **Backend API** | http://localhost:3000 | JWT token |
 | **MinIO Console** | http://localhost:9001 | minioadmin / minioadmin |
 | **PostgreSQL** | localhost:5432 | postgres / password |
@@ -75,7 +74,7 @@ npm run dev
 
 ### Creating Templates
 
-1. Log in with Auth0
+1. Register or log in
 2. Click "New Template"
 3. Add images, text, and shapes
 4. Customize colors, fonts, and layout
@@ -92,13 +91,17 @@ npm run dev
 ## 🔌 API Example
 
 ```javascript
-// Get access token from Auth0
-const token = await auth0.getTokenSilently();
+// Log in to get a JWT access token
+const { access_token } = await fetch('http://localhost:3000/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: 'you@example.com', password: 'password' })
+}).then(r => r.json());
 
 // Fetch templates
 const response = await fetch('http://localhost:3000/templates', {
   headers: {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `Bearer ${access_token}`,
     'Content-Type': 'application/json'
   }
 });
@@ -110,7 +113,6 @@ const templates = await response.json();
 
 ## 🔒 Security
 
-- OAuth 2.0 / OpenID Connect via Auth0
 - JWT token authentication on all endpoints
 - User isolation - templates are private per account
 - HTTPS for production deployments

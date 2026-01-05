@@ -6,9 +6,8 @@ This is a condensed version of the setup instructions. For detailed troubleshoot
 
 - Node.js 20.19+
 - Docker Desktop
-- Auth0 Account (free)
 
-## Setup in 6 Steps
+## Setup in 5 Steps
 
 ### 1. Clone & Navigate
 
@@ -17,49 +16,36 @@ git clone https://github.com/aronheredi/imagetemplate.git
 cd imagetemplate
 ```
 
-### 2. Configure Auth0
-
-Create these in your Auth0 dashboard:
-
-1. **Single Page Application** → Note Domain & Client ID
-   - Add callback URL: `http://localhost:5173/callback`
-   - Add logout URL: `http://localhost:5173`
-   - Add web origin: `http://localhost:5173`
-
-2. **Machine to Machine Application** → Note Client ID & Secret
-
-3. **API** with identifier: `http://imagetemplate`
-
-### 3. Start Docker
+### 2. Start Docker
 
 ```bash
 docker-compose up -d
 ```
 
-### 4. Setup Backend
+### 3. Setup Backend
 
 ```bash
 cd backend/template-backend
 npm install
 cp .env.example .env
-# Edit .env with your Auth0 credentials
+# Set JWT_SECRET and DB/MINIO settings if needed
 npm run start:dev
 ```
 
-### 5. Setup Frontend
+### 4. Setup Frontend
 
 ```bash
 # In a new terminal
 cd frontend/template-frontend
 npm install
 cp .env.example .env
-# Edit .env with your Auth0 credentials
+# Set VITE_API_URL if needed
 npm run dev
 ```
 
-### 6. Open Browser
+### 5. Open Browser
 
-Go to http://localhost:5173 and log in!
+Go to http://localhost:5173 and register or log in.
 
 ## Environment Variables Cheat Sheet
 
@@ -80,12 +66,9 @@ MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=minioadmin
 MINIO_BUCKET=images
 
-# Auth0
-AUTH0_DOMAIN=YOUR-TENANT.us.auth0.com
-AUTH0_AUDIENCE=http://imagetemplate
-AUTH0_M2M_DOMAIN=YOUR-TENANT.us.auth0.com
-AUTH0_M2M_CLIENT_ID=YOUR-M2M-CLIENT-ID
-AUTH0_M2M_CLIENT_SECRET=YOUR-M2M-CLIENT-SECRET
+# JWT
+# Used to sign/verify access tokens
+JWT_SECRET=change-me
 
 PORT=3000
 ```
@@ -93,9 +76,6 @@ PORT=3000
 ### Frontend (.env)
 
 ```env
-VITE_AUTH0_DOMAIN=YOUR-TENANT.us.auth0.com
-VITE_AUTH0_AUDIENCE=http://imagetemplate
-VITE_AUTH0_CLIENT_ID=YOUR-SPA-CLIENT-ID
 VITE_API_URL=http://localhost:3000
 ```
 
@@ -131,9 +111,9 @@ npx kill-port 5173
 ## Common Issues
 
 **401 Unauthorized?**
-- Check Auth0 credentials in .env files
-- Verify Auth0 callback URLs are configured
-- Try logging out and back in
+- Ensure you're logged in (token present in the browser)
+- If you changed `JWT_SECRET`, re-login to get a new token
+- Try clearing site data (localStorage) and logging in again
 
 **Port in use?**
 ```bash

@@ -1,6 +1,6 @@
 # API Documentation
 
-The backend API is built with NestJS and secured with Auth0 JWT authentication. All endpoints (except health checks) require a valid JWT token in the Authorization header.
+The backend API is built with NestJS and secured with JWT authentication. Users are stored in PostgreSQL; clients obtain a JWT by calling the login/register endpoints and then include it as a Bearer token on protected routes.
 
 ## Table of Contents
 
@@ -18,11 +18,16 @@ The backend API is built with NestJS and secured with Auth0 JWT authentication. 
 All API requests must include a Bearer token in the Authorization header:
 
 ```javascript
-const token = await auth0Client.getTokenSilently();
+// 1) Log in (or register) to get a JWT
+const { access_token } = await fetch('http://localhost:3000/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: 'you@example.com', password: 'password' })
+}).then(r => r.json());
 
 fetch('http://localhost:3000/templates', {
   headers: {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `Bearer ${access_token}`,
     'Content-Type': 'application/json'
   }
 })
@@ -204,28 +209,66 @@ Binary image data with appropriate Content-Type header.
 
 ### Authentication Endpoints
 
-#### Exchange Code for Token
+#### Register
 
-Exchanges an authorization code for access tokens (used internally by the frontend).
+Creates a new user (stored in PostgreSQL) and returns a JWT.
 
 ```http
-POST /auth/callback
+POST /auth/register
 Content-Type: application/json
 
 {
-  "code": "authorization_code",
-  "redirect_uri": "http://localhost:5173/callback"
+  "email": "you@example.com",
+  "password": "password",
+  "name": "Your Name"
 }
 ```
 
 **Response:**
 ```json
 {
-  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "id_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refresh_token": "v1.abc123...",
-  "expires_in": 86400
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid",
+    "email": "you@example.com",
+    "name": "Your Name"
+  }
 }
+```
+
+#### Login
+
+Authenticates an existing user and returns a JWT.
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "you@example.com",
+  "password": "password"
+}
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid",
+    "email": "you@example.com",
+    "name": "Your Name"
+  }
+}
+```
+
+#### Get Current User
+
+Returns the current authenticated user.
+
+```http
+GET /auth/me
+Authorization: Bearer {token}
 ```
 
 ## JavaScript Integration Example
@@ -233,36 +276,38 @@ Content-Type: application/json
 Here's a complete example of how to integrate with the API:
 
 ```javascript
-import { Auth0Client } from '@auth0/auth0-spa-js';
+// One-time login helper
+async function login(email, password) {
+  const res = await fetch('http://localhost:3000/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
 
-// Initialize Auth0
-const auth0 = new Auth0Client({
-  domain: 'your-tenant.us.auth0.com',
-  clientId: 'your-client-id',
-  authorizationParams: {
-    audience: 'http://imagetemplate',
-    redirect_uri: window.location.origin
+  if (!res.ok) {
+    throw new Error('Login failed');
   }
-});
+
+  const data = await res.json();
+  return data.access_token;
+}
 
 // Authenticated API helper
-async function apiCall(endpoint, options = {}) {
-  const token = await auth0.getTokenSilently();
-  
+async function apiCall(endpoint, token, options = {}) {
   const response = await fetch(`http://localhost:3000${endpoint}`, {
     ...options,
     headers: {
       ...options.headers,
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
     }
   });
-  
+
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json().catch(() => ({}));
     throw new Error(error.message || 'API request failed');
   }
-  
+
   return response.json();
 }
 
@@ -303,7 +348,6 @@ class TemplateAPI {
   
   // Upload image
   async uploadImage(file) {
-    const token = await auth0.getTokenSilently();
     const formData = new FormData();
     formData.append('file', file);
     
@@ -320,6 +364,7 @@ class TemplateAPI {
 }
 
 // Usage
+const token = await login('you@example.com', 'password');
 const templateAPI = new TemplateAPI();
 
 // Get all templates
