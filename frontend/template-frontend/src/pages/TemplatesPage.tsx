@@ -34,7 +34,7 @@ function TemplatesPage() {
     const { data, isLoading, isError, refetch, error } = useQuery({
         queryKey: ['templates'],
         queryFn: async () => {
-            const response = await api.get('/templates')
+            const response = await api.get('/templates/user/' + user?.id);
             if (response.status < 200 || response.status >= 300) {
                 throw new Error('Network response was not ok')
             }
